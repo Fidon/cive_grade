@@ -1,0 +1,217 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/roboto-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+body {
+    scroll-behavior: smooth;
+    background-image: url('../imgs/sprinkle.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-blend-mode: normal;
+    font-family: 'Roboto';
+    font-size: 0;
+    animation: fadeInAnimation ease .8s;
+	animation-iteration-count: 1;
+	animation-fill-mode: forwards;  
+}
+@keyframes fadeInAnimation {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+body * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+}
+#container {
+    display: block;
+    float: left;
+    width: 100%;
+    min-height: 100vh;
+    /* background-color: rgba(255,255,255,.8); */
+    background-color: rgba(254, 236, 235, .8);
+    font-size: 15px;
+}
+
+
+#container header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+}
+#container header .divlogo,
+#container header .divbars {
+    width: 50%;
+    float: left;
+    padding: 10px 0;
+}
+#container header .divlogo img {
+    display: inline-block;
+    width: 90px;
+    margin-left: 15px;
+}
+#container header .divbars span {
+    display: none;
+    float: right;
+    margin-right: 20px;
+    margin-top: 15px;
+    border: 1px solid #FEECEB;
+    padding: 5px 12px;
+    font-size: 22px;
+    color: #FEECEB;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#container .main {
+    margin-top: 96px;
+    display: flex;
+    width: 100%;
+}
+
+#container .main nav {
+    float: left;
+    width: 250px;
+    min-height: 100vh;
+    padding: 5px;
+    padding-right: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#navbar .link,
+#menucanvas .link {
+    display: block;
+    width: 100%;
+    float: left;
+    margin-bottom: 4px;
+}
+#navbar .link a,
+#navbar .link .header,
+#menucanvas .link a,
+#menucanvas .link .header {
+    display: block;
+    width: 100%;
+    float: left;
+    color: #FFFFFF;
+    border: 1px solid rgba(254, 236, 235, .3);
+    border-right: none;
+    padding: 10px 0;
+    padding-left: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+#navbar .link .header,
+#menucanvas .link .header {
+    padding-right: 5px;
+}
+#navbar .link a:hover,
+#navbar .link .header:hover,
+#menucanvas .link a:hover,
+#menucanvas .link .header:hover {
+    background-color: #FEECEB;
+    color: #2D2D2D;
+}
+#navbar .link span i:nth-child(2),
+#navbar .link span i:nth-child(3),
+#menucanvas .link span i:nth-child(2),
+#menucanvas .link span i:nth-child(3) {
+    float: right;
+    position: relative;
+    top: 4px;
+}
+#navbar .link span i:nth-child(3),
+#menucanvas .link span i:nth-child(3) {
+    display: none;
+}
+#navbar .link div,
+#menucanvas .link div {
+    display: none;
+    width: 100%;
+    float: left;
+    padding: 2px 0;
+    padding-left: 7px;
+}
+#navbar .link div a,
+#menucanvas .link div a {
+    padding: 7px 0 7px 5px;
+    margin: 1px 0;
+}
+
+#container .main .wrapper {
+    flex-grow: 1;
+    float: left;
+    width: calc(100% - 250px);
+    height: auto;
+    min-height: 100vh;
+    padding: 5px;
+    text-align: center;
+}
+#contents form input,
+#contents form select,
+#contents form textarea {
+    border: 1px solid rgb(66,139,202,.4);
+}
+#contents form input:focus,
+#contents form select:focus,
+#contents form textarea:focus {
+    border-color: #428BCA;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 7px rgba(66,139,202, 0.6);
+    outline: none;
+}
+
+#container footer {
+    width: 100%;
+    padding: 30px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#container footer span {
+    font-size: 14px;
+    display: inline-block;
+    margin: 0 10px;
+    text-align: center;
+}
+
+@media only screen and (max-width: 820px) {
+    #container .main {
+        margin-top: 71px;
+    }
+    #container header .divlogo img {
+        width: 60px;
+        margin-left: 8px;
+    }
+    #container header .divbars span {
+        display: inline-block;
+        margin-top: 3px;
+    }
+    #container .main nav {
+        display: none;
+    }
+    #menucanvas .link .header,
+    #menucanvas .link a {
+        padding: 18px 8px;
+    }
+    #menucanvas .link div a {
+        padding: 15px 5px;
+    }
+    #container .main .wrapper {
+        width: 100%;
+    }
+    #container footer span {
+        font-size: 12px;
+    }
+}

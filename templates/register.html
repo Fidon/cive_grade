@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcat icon" href="{% static 'imgs/logo.png' %}" />
+    <title>Register new account | CIVE Grade</title>
+    <link href="{% static 'fontawesome-6.2.1/css/all.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'scss/custom.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/auth.css' %}" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="container" class="d-block w-100 position-relative">
+      <div class="form_div text-center shadow-lg rounded">
+        <div class="d-block w-100 fs-5 py-1 mb-2 text-start text-ttxt1">Fill out the form to register..</div>
+        <form id="register_form" action="{% url 'register_url' %}" autocomplete="off" class="d-block w-100">
+          <div class="formsms text-start mb-1 w-100"></div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt1" id="reg_fullname" name="fullname" placeholder="a" required autofocus />
+            <label for="reg_fullname" class="form-label text-ttxt1">Fullnames</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt1" id="reg_username" name="username" placeholder="a" required />
+            <label for="reg_username" class="form-label text-ttxt1">Username</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt1" id="reg_phone" name="phone" placeholder="a" required />
+            <label for="reg_phone" class="form-label text-ttxt1">Mobile number</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="password" class="form-control text-ttxt1" id="reg_password1" name="password" placeholder="a" required />
+            <label for="reg_password1" class="form-label text-ttxt1">Password</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="password" class="form-control text-ttxt1" id="reg_password2" placeholder="a" required />
+            <label for="reg_password2" class="form-label text-ttxt1">Confirm password</label>
+          </div>
+          <div class="form-floating mt-3">
+            <a href="{% url 'auth_url' %}" id="login_url_btn" class="link link-bblue fs-6 d-inline-block float-start mt-2">Sign in instead..</a>
+            <button type="submit" id="reg_submit_button" class="btn btn-lg btn-bblue text-white d-inline-block float-end">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
+    <script src="{% static 'bootstrap-5.3.0/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+  </body>
+</html>

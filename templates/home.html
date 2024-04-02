@@ -1,0 +1,59 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block title %}
+  Home | CIVE Grade
+{% endblock %}
+{% block styles %}
+  <link href="{% static 'css/home.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contents %}
+  <table class="table w-75 text-ttxt table-borderless d-none">
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          {% for col in cols %}
+            {% if row == 0 and col == 0 %}
+              <td>
+                <span></span>
+              </td>
+            {% elif row == 0 and col == 24 %}
+              <td>
+                <span></span>
+              </td>
+            {% elif row == 49 and col == 0 %}
+              <td>
+                <span></span>
+              </td>
+            {% elif row == 49 and col == 24 %}
+              <td>
+                <span></span>
+              </td>
+            {% elif col == 12 %}
+              <td>{{ row|add:51 }}</td>
+            {% elif col == 1 %}
+              <td>{{ row|add:1 }}</td>
+            {% elif col == 0 or col == 24 %}
+              <td></td>
+            {% else %}
+              <td class="py-2 border"></td>
+            {% endif %}
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <form id="upload_form" action="{% url 'upload_majibu' %}" method="post" autocomplete="off" class="d-inline-block w-50 p-5">
+    <div class="formsms text-start mb-1"></div>
+    <div class="form-floating mt-2">
+      <input type="file" class="form-control" id="file_img" name="majibu" required />
+      <label for="file_img" class="form-label text-ttxt1">Add image</label>
+    </div>
+    <div class="form-floating mt-3">
+      <button type="submit" id="majibu_button" class="btn btn-lg btn-bblue text-white d-inline-block float-end">Submit</button>
+    </div>
+  </form>
+{% endblock %}
+{% block scripts %}
+  <script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
