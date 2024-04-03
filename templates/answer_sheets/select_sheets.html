@@ -13,10 +13,11 @@
         <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 1 of 5: Custom Answer Sheet Name</div>
         <div class="formsms w-100 float-start text-start my-1"></div>
         <div class="form-floating d-block w-100 float-start my-1">
-          <input type="text" minlength="3" maxlength="64" class="form-control text-ttxt1" name="names" id="custom_name" placeholder="p" required autofocus />
+          <input type="text" minlength="3" maxlength="64" class="form-control text-ttxt1" name="names" id="custom_name" value="{{ names }}" placeholder="p" required autofocus />
           <label for="custom_name" class="form-label text-ttxt1">Enter sheet name</label>
         </div>
         <input type="hidden" name="step" value="2" />
+        <input type="hidden" name="sheet" value="{{ sheet }}" />
         <div class="form-floating d-block w-100 float-start my-3 text-end">
           <button type="submit" id="submit_sheetname_btn" class="btn btn-bblight text-white d-inline-block">Next <i class="fas fa-long-arrow-right"></i></button>
         </div>
@@ -38,119 +39,166 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Name</td>
-              <td class="text-center">
-                <div class="form-check form-switch form-check-inline">
-                  <input class="form-check-input" type="checkbox" checked />
-                </div>
-              </td>
-              <td>
-                <input type="text" class="form-control text-ttxt1" value="Name" placeholder="Enter label" required />
-              </td>
-              <td>
-                <select class="form-select d-inline-block w-auto text-ttxt1" required>
-                  <option value="s">Small</option>
-                  <option value="m">Medium</option>
-                  <option value="l">Large</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Exam</td>
-              <td class="text-center">
-                <div class="form-check form-switch form-check-inline">
-                  <input class="form-check-input" type="checkbox" checked />
-                </div>
-              </td>
-              <td>
-                <input type="text" class="form-control text-ttxt1" value="Exam" placeholder="Enter label" required />
-              </td>
-              <td>
-                <select class="form-select d-inline-block w-auto text-ttxt1" required>
-                  <option value="s">Small</option>
-                  <option value="m">Medium</option>
-                  <option value="l">Large</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Class</td>
-              <td class="text-center">
-                <div class="form-check form-switch form-check-inline">
-                  <input class="form-check-input" type="checkbox" checked />
-                </div>
-              </td>
-              <td>
-                <input type="text" minlength="3" class="form-control text-ttxt1" value="Class" placeholder="Enter label" required />
-              </td>
-              <td>
-                <select class="form-select d-inline-block w-auto text-ttxt1" required>
-                  <option value="s">Small</option>
-                  <option value="m">Medium</option>
-                  <option value="l">Large</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Item1</td>
-              <td class="text-center">
-                <div class="form-check form-switch form-check-inline">
-                  <input class="form-check-input" type="checkbox" />
-                </div>
-              </td>
-              <td>
-                <input type="text" minlength="3" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
-              </td>
-              <td>
-                <select class="form-select d-inline-block w-auto text-ttxt1" disabled>
-                  <option value="s">Small</option>
-                  <option value="m">Medium</option>
-                  <option value="l">Large</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Item2</td>
-              <td class="text-center">
-                <div class="form-check form-switch form-check-inline">
-                  <input class="form-check-input" type="checkbox" />
-                </div>
-              </td>
-              <td>
-                <input type="text" minlength="3" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
-              </td>
-              <td>
-                <select class="form-select d-inline-block w-auto text-ttxt1" disabled>
-                  <option value="s">Small</option>
-                  <option value="m">Medium</option>
-                  <option value="l">Large</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Item3</td>
-              <td class="text-center">
-                <div class="form-check form-switch form-check-inline">
-                  <input class="form-check-input" type="checkbox" />
-                </div>
-              </td>
-              <td>
-                <input type="text" minlength="3" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
-              </td>
-              <td>
-                <select class="form-select d-inline-block w-auto text-ttxt1" disabled>
-                  <option value="s">Small</option>
-                  <option value="m">Medium</option>
-                  <option value="l">Large</option>
-                </select>
-              </td>
-            </tr>
+            {% if header_boxes %}
+              {% for hd in header_boxes %}
+                <tr>
+                  <td>{{ hd.header }}</td>
+                  <td class="text-center">
+                    <div class="form-check form-switch form-check-inline">
+                      {% if hd.enabled %}
+                        <input class="form-check-input" type="checkbox" checked />
+                      {% else %}
+                        <input class="form-check-input" type="checkbox" />
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    {% if hd.enabled %}
+                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" required />
+                    {% else %}
+                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" required disabled />
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if hd.enabled %}
+                      <select class="form-select d-inline-block w-auto text-ttxt1" required>
+                        {% for s in sizes %}
+                          {% if s.short == hd.size %}
+                            <option value="{{ s.short }}" selected>{{ s.long }}</option>
+                          {% else %}
+                            <option value="{{ s.short }}">{{ s.long }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    {% else %}
+                      <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
+                        {% for s in sizes %}
+                          {% if s.short == hd.size %}
+                            <option value="{{ s.short }}" selected>{{ s.long }}</option>
+                          {% else %}
+                            <option value="{{ s.short }}">{{ s.long }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td>Name</td>
+                <td class="text-center">
+                  <div class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" checked />
+                  </div>
+                </td>
+                <td>
+                  <input type="text" class="form-control text-ttxt1" value="Name" placeholder="Enter label" required />
+                </td>
+                <td>
+                  <select class="form-select d-inline-block w-auto text-ttxt1" required>
+                    <option value="s">Small</option>
+                    <option value="m">Medium</option>
+                    <option value="l">Large</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Exam</td>
+                <td class="text-center">
+                  <div class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" checked />
+                  </div>
+                </td>
+                <td>
+                  <input type="text" class="form-control text-ttxt1" value="Exam" placeholder="Enter label" required />
+                </td>
+                <td>
+                  <select class="form-select d-inline-block w-auto text-ttxt1" required>
+                    <option value="s">Small</option>
+                    <option value="m">Medium</option>
+                    <option value="l">Large</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Class</td>
+                <td class="text-center">
+                  <div class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" checked />
+                  </div>
+                </td>
+                <td>
+                  <input type="text" class="form-control text-ttxt1" value="Class" placeholder="Enter label" required />
+                </td>
+                <td>
+                  <select class="form-select d-inline-block w-auto text-ttxt1" required>
+                    <option value="s">Small</option>
+                    <option value="m">Medium</option>
+                    <option value="l">Large</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Item1</td>
+                <td class="text-center">
+                  <div class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" />
+                  </div>
+                </td>
+                <td>
+                  <input type="text" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
+                </td>
+                <td>
+                  <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
+                    <option value="s">Small</option>
+                    <option value="m">Medium</option>
+                    <option value="l">Large</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Item2</td>
+                <td class="text-center">
+                  <div class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" />
+                  </div>
+                </td>
+                <td>
+                  <input type="text" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
+                </td>
+                <td>
+                  <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
+                    <option value="s">Small</option>
+                    <option value="m">Medium</option>
+                    <option value="l">Large</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Item3</td>
+                <td class="text-center">
+                  <div class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" />
+                  </div>
+                </td>
+                <td>
+                  <input type="text" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
+                </td>
+                <td>
+                  <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
+                    <option value="s">Small</option>
+                    <option value="m">Medium</option>
+                    <option value="l">Large</option>
+                  </select>
+                </td>
+              </tr>
+            {% endif %}
           </tbody>
         </table>
         <input type="hidden" value="{{ sheet }}" id="sheet_input_id" />
         <div class="form-floating d-block w-100 float-start my-3">
-          <a href="{% url 'create_custom_sheet' 1 %}" id="back_btn_1" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
+          <a href="{% url 'create_custom_sheet' 1 sheet %}" id="back_btn_1" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
           <button type="submit" id="forward_btn_2" class="btn btn-bblight text-white d-inline-block float-end">Next <i class="fas fa-long-arrow-right"></i></button>
         </div>
       </form>
@@ -161,47 +209,125 @@
         <div class="d-block w-100 float-start text-start fs-6 py-1 mb-3">
           <b>Sheet name:</b> Previous name
         </div>
-        <div class="d-block w-100 float-start">
-          <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
-            Include ID section:<div class="form-check form-switch form-check-inline">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="id_check" checked />
+        {% if id_section %}
+          <div class="d-block w-100 float-start">
+            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
+              Include ID section:<div class="form-check form-switch form-check-inline">
+                <div class="form-check form-switch">
+                  {% if id_section.id_status %}
+                    <input class="form-check-input" type="checkbox" id="id_check" checked />
+                  {% else %}
+                    <input class="form-check-input" type="checkbox" id="id_check" />
+                  {% endif %}
+                </div>
               </div>
             </div>
+            {% if id_section.id_status %}
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
+                Number of student ID digits: &nbsp;<select class="form-select d-inline-block w-auto" id="id_select">
+                  {% for num in v_labels %}
+                    {% if id_section.id_digits == num %}
+                      <option value="{{ num }}" selected>{{ num }}</option>
+                    {% else %}
+                      <option value="{{ num }}">{{ num }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
+                Label for Student ID Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" id="id_label" value="{{ id_section.id_labels }}" required />
+              </div>
+            {% else %}
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
+                Number of student ID digits: &nbsp;<select class="form-select d-inline-block w-auto" id="id_select" disabled>
+                  {% for num in v_labels %}
+                    {% if id_section.id_digits == num %}
+                      <option value="{{ num }}" selected>{{ num }}</option>
+                    {% else %}
+                      <option value="{{ num }}">{{ num }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
+                Label for Student ID Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" id="id_label" value="{{ id_section.id_labels }}" required disabled />
+              </div>
+            {% endif %}
           </div>
-          <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-            Number of student ID digits: &nbsp;<select class="form-select d-inline-block w-auto" id="id_select">
-              {% for num in v_labels %}
-                {% if num == 5 %}
-                  <option value="{{ num }}" selected>{{ num }}</option>
-                {% else %}
-                  <option value="{{ num }}">{{ num }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
-          </div>
-          <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-            Label for Student ID Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" id="id_label" value="Student ID" required />
-          </div>
-        </div>
-        <div class="d-block w-100 float-start mt-5">
-          <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
-            Include Key Version Section:<div class="form-check form-switch form-check-inline">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="keys_check" checked />
+        {% else %}
+          <div class="d-block w-100 float-start">
+            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
+              Include ID section:<div class="form-check form-switch form-check-inline">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="id_check" checked />
+                </div>
               </div>
             </div>
+            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
+              Number of student ID digits: &nbsp;<select class="form-select d-inline-block w-auto" id="id_select">
+                {% for num in v_labels %}
+                  {% if num == 5 %}
+                    <option value="{{ num }}" selected>{{ num }}</option>
+                  {% else %}
+                    <option value="{{ num }}">{{ num }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
+              Label for Student ID Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" id="id_label" value="Student ID" required />
+            </div>
           </div>
-          <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-            Letters for key versions: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="2" value="ABCDE" id="keys_letters" required />
+        {% endif %}
+        {% if keys_section %}
+          <div class="d-block w-100 float-start mt-5">
+            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
+              Include Key Version Section:<div class="form-check form-switch form-check-inline">
+                <div class="form-check form-switch">
+                  {% if keys_section.key_status %}
+                    <input class="form-check-input" type="checkbox" id="keys_check" checked />
+                  {% else %}
+                    <input class="form-check-input" type="checkbox" id="keys_check" />
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% if keys_section.key_status %}
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
+                Letters for key versions: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="2" value="{{ keys_section.key_letters }}" id="keys_letters" required />
+              </div>
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
+                Label for Key Version Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" value="{{ keys_section.key_labels }}" id="keys_label" required />
+              </div>
+            {% else %}
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
+                Letters for key versions: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="2" value="{{ keys_section.key_letters }}" id="keys_letters" required disabled />
+              </div>
+              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
+                Label for Key Version Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" value="{{ keys_section.key_labels }}" id="keys_label" required disabled />
+              </div>
+            {% endif %}
           </div>
-          <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-            Label for Key Version Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" value="Keys" id="keys_label" required />
+        {% else %}
+          <div class="d-block w-100 float-start mt-5">
+            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
+              Include Key Version Section:<div class="form-check form-switch form-check-inline">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="keys_check" checked />
+                </div>
+              </div>
+            </div>
+            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
+              Letters for key versions: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="2" value="ABCDE" id="keys_letters" required />
+            </div>
+            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
+              Label for Key Version Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" value="Keys" id="keys_label" required />
+            </div>
           </div>
-        </div>
+        {% endif %}
         <input type="hidden" value="{{ sheet }}" id="sheet_input_id" />
         <div class="form-floating d-block w-100 float-start my-3">
-          <a href="{% url 'create_custom_sheet' 2 %}" id="back_btn_2" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
+          <a href="{% url 'create_custom_sheet' 2 sheet %}" id="back_btn_2" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
           <button type="submit" id="forward_btn_3" class="btn btn-bblight text-white d-inline-block float-end">Next <i class="fas fa-long-arrow-right"></i></button>
         </div>
       </form>
@@ -218,14 +344,69 @@
               <th>Number</th>
               <th>Type</th>
               <th>Labels</th>
-              <th>Width</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td colspan="5" class="py-5">No questions defined yet; Use below buttons to add questions.</td>
-            </tr>
+            {% if questions_list %}
+              {% for qns in questions_list %}
+                {% for question in qns.range %}
+                  {% if qns.type == 'multichoice' %}
+                    <tr>
+                      <td>count</td>
+                      {% if qns.qns.qn_type == 1 %}
+                        <td class="text-start">Internal labels</td>
+                      {% else %}
+                        <td class="text-start">External labels</td>
+                      {% endif %}
+                      <td class="text-start">{{ qns.qns.qn_labels }}</td>
+                      <td>
+                        <div class="form-check d-inline-block">
+                          <input class="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                    </tr>
+                  {% elif qns.type == 'verboselabel' %}
+                    <tr>
+                      <td>count</td>
+                      <td class="text-start">Verbose labels</td>
+                      <td class="text-start">
+                        <ul>
+                          {% for vb in qns.qns %}
+                            <li>{{ vb.short }}: {{ vb.long }}</li>
+                          {% endfor %}
+                        </ul>
+                      </td>
+                      <td>
+                        <div class="form-check d-inline-block">
+                          <input class="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                    </tr>
+                  {% elif qns.type == 'verboseqns' %}
+                    <tr>
+                      <td>count</td>
+                      <td class="text-start">Verbose questions</td>
+                      <td class="text-start">Max chars: {{ qns.qns.chars }}</td>
+                      <td>
+                        <div class="form-check d-inline-block">
+                          <input class="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+              <tr id="select_qns_tr">
+                <td colspan="5" class="text-end py-3">
+                  <button type="button" id="remove_qns_btn" class="btn btn-bblight text-white"><i class="fas fa-trash"></i> Remove selected</button>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="5" class="py-5">No questions defined yet; Use below buttons to add questions.</td>
+              </tr>
+            {% endif %}
           </tbody>
         </table>
         <div class="form-floating d-block w-100 float-start my-3 text-start">
@@ -234,7 +415,7 @@
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_questions_modal">Add verbose questions</button>
         </div>
         <div class="form-floating d-block w-100 float-start my-3">
-          <a href="{% url 'create_custom_sheet' 3 %}" id="cancel_publish_btn" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
+          <a href="{% url 'create_custom_sheet' 3 sheet %}" id="cancel_publish_btn" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
           <button type="submit" id="publish_btn" class="btn btn-bblight text-white d-inline float-end">Publish <i class="fas fa-check-circle"></i></button>
         </div>
       </form>
@@ -286,7 +467,7 @@
 
       {% comment %}modal to add verbose label questions{% endcomment %}
       <div class="modal fade" id="verbose_label_modal">
-        <form class="modal-dialog" id="verbose_label_form" action="{% url 'save_sheet' %}">
+        <form class="modal-dialog" id="verbose_label_form" action="{% url 'save_sheet' %}" autocomplete="on">
           <div class="modal-content">
             <div class="modal-header bg-bblight">
               <h5 class="modal-title text-white">Add verbose-label questions..</h5>

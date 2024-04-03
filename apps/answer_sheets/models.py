@@ -11,7 +11,7 @@ def dtime():
 class CustomSheet(models.Model):
     id = models.AutoField(primary_key=True)
     regdate = models.DateTimeField(default=dtime)
-    names = models.CharField(max_length=64)
+    names = models.CharField(max_length=200)
     teacher = models.ForeignKey(CustomUser, on_delete=models.PROTECT, related_name='teacher')
     published = models.BooleanField(default=False)
     objects = models.Manager()

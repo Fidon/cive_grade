@@ -126,7 +126,7 @@ $(function () {
         var data = [
             {
                 'id_status': $('#id_check').is(':checked'),
-                'id_digits': $('#id_select').val(),
+                'id_digits': parseInt($('#id_select').val()),
                 'id_labels': $.trim($('#id_label').val()),
             },
             {
@@ -176,7 +176,7 @@ $(function () {
         e.preventDefault();
 
         var questions = {
-                'qn_type': $('#multi_type').val(),
+                'qn_type': parseInt($('#multi_type').val()),
                 'qn_labels': $.trim($('#multi_labels').val()),
             }
 
@@ -287,7 +287,7 @@ $(function () {
         e.preventDefault();
 
         var formdata = new FormData();
-        formdata.append('questions', JSON.stringify({'chars': $('#verb_num_chars').val()}));
+        formdata.append('questions', JSON.stringify({'chars': parseInt($('#verb_num_chars').val())}));
         formdata.append('qns_type', $('#qn_type_verboseqns').val());
         formdata.append('qn_number', $('#verb_num_questions').val());
         formdata.append('step', 5);
@@ -363,4 +363,244 @@ $(function () {
             }
         });
     });
-})
+
+    function get_dates(dt) {
+        const mindate = $('#min_date').val();
+        const maxdate = $('#max_date').val();
+        let dt_start = "";
+        let dt_end = "";
+        if (mindate) dt_start = mindate + ' 00:00:00.000000';
+        if (maxdate) dt_end = maxdate + ' 23:59:59.999999';
+        return (dt === 0) ? dt_start : dt_end;
+    }
+
+    $("#customsheets_table thead tr").clone(true).attr('class','filters').appendTo('#customsheets_table thead');
+    var customsheets_table = $("#customsheets_table").DataTable({
+        fixedHeader: true,
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: $("#custom_sheet_url").val(),
+            type: "POST",
+            data: function (d) {
+                d.startdate = get_dates(0);
+                d.enddate = get_dates(1);
+            },
+            dataType: 'json',
+            headers: { 'X-CSRFToken': CSRF_TOKEN },
+        },
+        columns: [
+            { data: 'count' },
+            { data: 'regdate' },
+            { data: 'names' },
+            { data: 'questions' },
+            { data: 'status' },
+            { data: 'action' },
+        ],
+        order: [[2, 'asc']],
+        paging: true,
+        lengthMenu: [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
+        pageLength: 10,
+        lengthChange: true,
+        autoWidth: true,
+        searching: true,
+        bInfo: true,
+        bSort: true,
+        orderCellsTop: true,
+        columnDefs: [{
+            "targets": [0, 5],
+            "orderable": false,
+        },
+        {
+            targets: [2, 4],
+            className: 'text-start',
+        },
+        {
+            targets: 5,
+            className: 'align-middle text-nowrap text-center',
+            createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                var cell_content =`<button type="button" class="btn btn-bblight btn-sm text-white"><i class="fas fa-trash-alt"></i></button>`;
+                $(cell).html(cell_content);
+                $(cell).find('button').on('click', function(e) {
+                    e.preventDefault();
+                    $("#confirm_delete_modal strong").text(rowData.names);
+                    $("#sheet_del_id").val(rowData.id);
+                    $("#confirm_delete_modal").modal('show');
+                });
+            }
+        }],
+        dom: "lBfrtip",
+        buttons: [
+            { // Copy button
+                extend: "copy",
+                text: "<i class='fas fa-clone'></i>",
+                className: "btn btn-bblight text-white",
+                titleAttr: "Copy",
+                title: "Custom answer sheets - CIVE Grade",
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4]
+                }
+            },
+            { // PDF button
+                extend: "pdf",
+                text: "<i class='fas fa-file-pdf'></i>",
+                className: "btn btn-bblight text-white",
+                titleAttr: "Export to PDF",
+                title: "Custom answer sheets - CIVE Grade",
+                filename: 'custom-sheets-civegrade',
+                orientation: 'portrait',
+                pageSize: 'A4',
+                footer: true,
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4],
+                    search: 'applied',
+                    order: 'applied'
+                },
+                tableHeader: {
+                    alignment: "center"
+                },
+                customize: function(doc) {
+                    doc.styles.tableHeader.alignment = "center";
+                    doc.styles.tableBodyOdd.alignment = "center";
+                    doc.styles.tableBodyEven.alignment = "center";
+                    doc.styles.tableHeader.fontSize = 7;
+                    doc.defaultStyle.fontSize = 6;
+                    doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');
+
+                    var body = doc.content[1].table.body;
+                    for (i = 1; i < body.length; i++) {
+                        doc.content[1].table.body[i][0].margin = [3, 0, 0, 0];
+                        doc.content[1].table.body[i][0].alignment = 'center';
+                        doc.content[1].table.body[i][1].alignment = 'center';
+                        doc.content[1].table.body[i][2].alignment = 'left';
+                        doc.content[1].table.body[i][3].alignment = 'center';
+                        doc.content[1].table.body[i][4].alignment = 'left';
+                        doc.content[1].table.body[i][4].margin = [0, 0, 3, 0];
+
+                        for (let j = 0; j < body[i].length; j++) {
+                            body[i][j].style = "vertical-align: middle;";
+                        }
+                    }
+                }
+            },
+            { // Export to excel button
+                extend: "excel",
+                text: "<i class='fas fa-file-excel'></i>",
+                className: "btn btn-bblight text-white",
+                titleAttr: "Export to Excel",
+                title: "Custom answer sheets - CIVE Grade",
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4]
+                }
+            },
+            { // Print button
+                extend: "print",
+                text: "<i class='fas fa-print'></i>",
+                className: "btn btn-bblight text-white",
+                title: "Custom answer sheets - CIVE Grade",
+                orientation: 'portrait',
+                pageSize: 'A4',
+                titleAttr: "Print",
+                footer: true,
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4],
+                    search: 'applied',
+                    order: 'applied'
+                },
+                tableHeader: {
+                    alignment: "center"
+                },
+                customize: function (win) {
+                    $(win.document.body).css("font-size","11pt");
+                    $(win.document.body).find("table").addClass("compact").css("font-size","inherit");
+                }
+            }
+        ],
+        initComplete: function() {
+            var api = this.api();
+            api.columns([0, 1, 2, 3, 4, 5]).eq(0).each(function (colIdx) {
+                var cell = $(".filters th").eq($(api.column(colIdx).header()).index());
+                if (colIdx == 1) {
+                    var calendar =`<button type="button" class="btn btn-sm btn-bblight text-white" data-bs-toggle="modal" data-bs-target="#date_filter_modal"><i class="fas fa-calendar-alt"></i></button>`;
+                    cell.html(calendar);
+                    $("#date_clear").on("click", function() {
+                        $("#min_date").val("");
+                        $("#max_date").val("");
+                    });
+                    $("#date_filter_btn").on("click", function() {
+                        customsheets_table.draw();
+                    });
+                } else if (colIdx == 0 || colIdx == 5) {
+                    cell.html("");
+                } else {
+                    if (colIdx == 2 || colIdx == 4) {
+                        $(cell).html("<input type='text' class='text-ttxt float-start w-auto' placeholder='Filter..'/>");
+                    } else {
+                        $(cell).html("<input type='text' class='text-ttxt' placeholder='Filter..'/>");
+                    }
+                    $("input", $(".filters th").eq($(api.column(colIdx).header()).index()))
+                    .off("keyup change").on("keyup change", function(e) {
+                        e.stopPropagation();
+                        $(this).attr('title', $(this).val());
+                        var regexr = "{search}";
+                        var cursorPosition = this.selectionStart;
+                        api.column(colIdx).search(
+                            this.value != '' ? regexr.replace('{search}', this.value) : '',
+                            this.value != '',
+                            this.value == ''
+                            ).draw();
+                        $(this).focus()[0].setSelectionRange(cursorPosition, cursorPosition);
+                    });
+                }
+            });
+        }
+    });
+
+    $("#sheets_search").keyup(function() {
+        customsheets_table.search($(this).val()).draw();
+    });
+
+    $("#sheets_filter_clear").click(function (e) { 
+        e.preventDefault();
+        $("#sheets_search").val('');
+        customsheets_table.search('').draw();
+    });
+
+    $("#confirm_del_btn").click(function (e) { 
+        e.preventDefault();
+        
+        var formdata = new FormData();
+        formdata.append('delete_sheet', parseInt($('#sheet_del_id').val()));
+        
+        $.ajax({
+            type: 'POST',
+            url: $("#custom_sheet_url").val(),
+            data: formdata,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN
+            },
+            beforeSend: function() {
+                $("#cancel_del_btn").hide();
+                $("#confirm_del_btn").html("Deleting <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
+            },
+            success: function(response) {
+                $("#cancel_del_btn").show();
+                $("#confirm_del_btn").html(`<i class="fas fa-check-circle"></i> Yes`).attr('type', 'submit');
+                
+                if (response.success) {
+                    $('#confirm_delete_modal').modal('hide');
+                    customsheets_table.draw();
+                } else {
+                    var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+                    $("#confirm_delete_modal .formsms").html(fdback);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+            }
+        });
+    });
+});
