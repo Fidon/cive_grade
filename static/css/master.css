@@ -37,8 +37,7 @@ body * {
     float: left;
     width: 100%;
     min-height: 100vh;
-    /* background-color: rgba(255,255,255,.8); */
-    background-color: rgba(254, 236, 235, .8);
+    background-color: rgba(254, 236, 235, 1);
     font-size: 15px;
 }
 

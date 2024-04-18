@@ -41,6 +41,7 @@ def answer_sheets_page(request, step=None, sheet=None):
             sheet_questions = Questions.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).order_by('id')
             for qns in sheet_questions:
                 questions_list.append({
+                    'id': qns.id,
                     'type': qns.qn_type,
                     'range': range(int(qns.qn_number)),
                     'qns': qns.questions,
@@ -51,6 +52,7 @@ def answer_sheets_page(request, step=None, sheet=None):
             'custom_form': True,
             'step': step,
             'sheet': sheet,
+            'sheet_name': CustomSheet.objects.get(id=sheet) if sheet is not None and step > 0 else "",
             'questions': range(1, 51),
             'v_labels': range(1, 11),
             'answer_len': range(3, 16),
@@ -167,6 +169,20 @@ def save_custom_sheets(request):
                 custom_sheet.published = True
                 custom_sheet.save()
                 fdback = {'success': True, 'url': next_url}
+            except Exception as e:
+                fdback = {'success': False, 'sms': 'Unknown error..!'}
+        elif next_step == 7:
+            try:
+                questions = request.POST.get('questions')
+                questions = json.loads(questions)
+                for qn in questions:
+                    quest = Questions.objects.get(id=qn['id'])
+                    if (quest.qn_number - int(qn['qns'])) > 0:
+                        quest.qn_number = quest.qn_number - int(qn['qns'])
+                        quest.save()
+                    else:
+                        quest.delete()
+                fdback = {'success': True}
             except Exception as e:
                 fdback = {'success': False, 'sms': 'Unknown error..!'}
         return JsonResponse(fdback)

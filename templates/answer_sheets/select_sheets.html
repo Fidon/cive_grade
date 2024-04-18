@@ -27,7 +27,7 @@
         <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 2 of 5: Header boxes</div>
         <div class="formsms w-100 float-start text-start my-1"></div>
         <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 py-1">
-          <b>Sheet name:</b> Previous name
+          <b>Answer sheet name:</b> {{ sheet_name }}
         </div>
         <table class="table float-start my-1 table-striped text-ttxt1 text-start align-middle">
           <thead class="bg-bblight text-white">
@@ -98,7 +98,7 @@
                 <td>
                   <select class="form-select d-inline-block w-auto text-ttxt1" required>
                     <option value="s">Small</option>
-                    <option value="m">Medium</option>
+                    <option value="m" selected>Medium</option>
                     <option value="l">Large</option>
                   </select>
                 </td>
@@ -116,7 +116,7 @@
                 <td>
                   <select class="form-select d-inline-block w-auto text-ttxt1" required>
                     <option value="s">Small</option>
-                    <option value="m">Medium</option>
+                    <option value="m" selected>Medium</option>
                     <option value="l">Large</option>
                   </select>
                 </td>
@@ -207,7 +207,7 @@
         <div class="d-block w-100 float-start text-start fs-6 border-bottom border-ttxt1 py-1 mb-1">Step 3 of 5: Key Version and Student ID</div>
         <div class="formsms w-100 float-start text-start my-1"></div>
         <div class="d-block w-100 float-start text-start fs-6 py-1 mb-3">
-          <b>Sheet name:</b> Previous name
+          <b>Answer sheet name:</b> {{ sheet_name }}
         </div>
         {% if id_section %}
           <div class="d-block w-100 float-start">
@@ -333,11 +333,12 @@
       </form>
     {% elif step == 4 %}
       <input type="hidden" value="{{ sheet }}" id="custom_sheet_id" />
-      <form class="form_step4 d-inline-block mx-1 my-5 p-2 text-ttxt1" action="{% url 'save_sheet' %}" id="publish_sheet_form">
+      <form class="form_step4 mx-1 my-5 p-2 text-ttxt1" action="{% url 'save_sheet' %}" id="publish_sheet_form">
         <div class="d-block w-100 float-start text-start fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 4 of 5: Define Questions</div>
         <div class="d-block w-100 float-start text-start fs-6 py-1">
-          <b>Sheet name:</b> Previous name
+          <b>Answer sheet name:</b> {{ sheet_name }}
         </div>
+        <div class="formsms w-100 float-start text-start my-1"></div>
         <table class="table float-start my-1 table-striped text-center text-ttxt1 align-middle" id="qns_table">
           <thead class="bg-bblight text-white">
             <tr>
@@ -352,8 +353,8 @@
               {% for qns in questions_list %}
                 {% for question in qns.range %}
                   {% if qns.type == 'multichoice' %}
-                    <tr>
-                      <td>count</td>
+                    <tr class="tr_{{ qns.id }}">
+                      <td></td>
                       {% if qns.qns.qn_type == 1 %}
                         <td class="text-start">Internal labels</td>
                       {% else %}
@@ -367,8 +368,8 @@
                       </td>
                     </tr>
                   {% elif qns.type == 'verboselabel' %}
-                    <tr>
-                      <td>count</td>
+                    <tr class="tr_{{ qns.id }}">
+                      <td></td>
                       <td class="text-start">Verbose labels</td>
                       <td class="text-start">
                         <ul>
@@ -384,8 +385,8 @@
                       </td>
                     </tr>
                   {% elif qns.type == 'verboseqns' %}
-                    <tr>
-                      <td>count</td>
+                    <tr class="tr_{{ qns.id }}">
+                      <td></td>
                       <td class="text-start">Verbose questions</td>
                       <td class="text-start">Max chars: {{ qns.qns.chars }}</td>
                       <td>
@@ -413,15 +414,16 @@
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#multi_choice_modal">Add multiple-choice questions</button>
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_label_modal">Add verbose label questions</button>
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_questions_modal">Add verbose questions</button>
+          <button type="button" class="btn btn-bblue d-inline-block m-1" onclick="print()">Print</button>
         </div>
         <div class="form-floating d-block w-100 float-start my-3">
           <a href="{% url 'create_custom_sheet' 3 sheet %}" id="cancel_publish_btn" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
-          <button type="submit" id="publish_btn" class="btn btn-bblight text-white d-inline float-end">Publish <i class="fas fa-check-circle"></i></button>
+          <button type="button" id="publish_btn" class="btn btn-bblight text-white d-inline float-end" data-bs-toggle="modal" data-bs-target="#confirm_publish_modal">Publish <i class="fas fa-check-circle"></i></button>
         </div>
       </form>
 
       {% comment %}answer-sheet table for preview{% endcomment %}
-      <table class="table mx-1 my-5 text-ttxt table-borderless answerstable">
+      <table class="table my-5 text-ttxt table-bordered answerstable" id="answers_paper_table">
         <tbody></tbody>
       </table>
 
@@ -435,7 +437,7 @@
             </div>
             <div class="modal-body">
               <div class="formsms w-100 float-start text-start my-1"></div>
-              <div class="form-floating d-block w-100 float-start my-1">
+              <div class="form-floating d-block w-100 float-start my-1 d-none">
                 <select class="form-select text-ttxt1" id="multi_type" required>
                   <option value="1">Internal label</option>
                   <option value="2">External label</option>
@@ -483,7 +485,7 @@
                 </select>
                 <label class="form-label text-ttxt1" for="v_label_num_questions">Select number of questions</label>
               </div>
-              <div class="form-floating d-block w-100 float-start my-1">
+              <div class="form-floating d-block w-100 float-start my-1 d-none">
                 <select class="form-select text-ttxt1" id="v_show_labels" required>
                   <option value="1">Show short label</option>
                   <option value="0">Hide short label</option>
@@ -502,10 +504,10 @@
                     {% for lb in v_labels %}
                       <tr>
                         <td style="width:30px;">
-                          <input type="text" maxlength="1" class="l_short form-control text-ttxt1" />
+                          <input type="text" maxlength="1" minlength="1" class="l_short form-control text-ttxt1" />
                         </td>
                         <td>
-                          <input type="text" class="l_long form-control text-ttxt1" />
+                          <input type="text" minlength="3" class="l_long form-control text-ttxt1" />
                         </td>
                       </tr>
                     {% endfor %}
@@ -557,6 +559,28 @@
             </div>
           </div>
         </form>
+      </div>
+
+      {% comment %}modal to confirm publishing answer sheet {% endcomment %}
+      <div class="modal fade" id="confirm_publish_modal">
+        <div class="modal-dialog">
+          <form class="modal-content" id="publish_confirm_form">
+            <div class="modal-header bg-bblight">
+              <h5 class="modal-title text-white">Confirm publish..</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="formsms w-100 float-start text-start my-1"></div>
+              <div class="form-floating d-block w-100 float-start my-4 px-2">
+                You're about to publish <b>{{ sheet_name }}</b> answer sheet;<br>you won't be able to do any further modifications.<br>Are you sure to continue..?
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-ttxt1 text-white" data-bs-dismiss="modal" id="publish_cancel_btn"><i class="fas fa-times-circle"></i> Cancel</button>
+              <button type="submit" class="btn btn-bblight text-white" id="publish_confirm_btn">Publish <i class="fas fa-check-circle"></i></button>
+            </div>
+          </form>
+        </div>
       </div>
     {% endif %}
   {% else %}

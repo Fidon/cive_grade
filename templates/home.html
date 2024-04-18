@@ -7,43 +7,8 @@
   <link href="{% static 'css/home.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block contents %}
-  <table class="table w-75 text-ttxt table-borderless d-none">
-    <tbody>
-      {% for row in rows %}
-        <tr>
-          {% for col in cols %}
-            {% if row == 0 and col == 0 %}
-              <td>
-                <span></span>
-              </td>
-            {% elif row == 0 and col == 24 %}
-              <td>
-                <span></span>
-              </td>
-            {% elif row == 49 and col == 0 %}
-              <td>
-                <span></span>
-              </td>
-            {% elif row == 49 and col == 24 %}
-              <td>
-                <span></span>
-              </td>
-            {% elif col == 12 %}
-              <td>{{ row|add:51 }}</td>
-            {% elif col == 1 %}
-              <td>{{ row|add:1 }}</td>
-            {% elif col == 0 or col == 24 %}
-              <td></td>
-            {% else %}
-              <td class="py-2 border"></td>
-            {% endif %}
-          {% endfor %}
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <form id="upload_form" action="{% url 'upload_majibu' %}" method="post" autocomplete="off" class="d-inline-block w-50 p-5">
+  <form id="upload_formm" action="{% url 'upload_majibu' %}" enctype="multipart/form-data" method="post" autocomplete="off" class="d-inline-block w-50 p-5">
+    {% csrf_token %}
     <div class="formsms text-start mb-1"></div>
     <div class="form-floating mt-2">
       <input type="file" class="form-control" id="file_img" name="majibu" required />

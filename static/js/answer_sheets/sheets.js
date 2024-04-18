@@ -1,5 +1,33 @@
 $(function () {
     var CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var row_count = $("#qns_table tbody tr").length;
+    var remove_questions = true;
+    var row_number_added = false;
+
+    function add_row_number() {
+        if (row_number_added == false) {
+            row_count = $("#qns_table tbody tr").length;
+            $("#qns_table tbody tr").each(function (index, element) {
+                if(index <= (row_count-2)) {
+                    $(this).find('td:nth-child(1)').text(index+1);
+                }
+            });
+
+            // answer sheet table
+            var num_rows = Math.ceil(row_count/2);
+            var table_contents = ``;
+            for (let i=0; i<num_rows; i++) {
+                table_contents += `<tr>`;
+                for (let j=0; j<=13; j++) {
+                    table_contents += `<td>${j+1}</td>`;
+                }
+                table_contents += `</tr>`;
+            }
+            $("#answers_paper_table tbody").html(table_contents);
+            row_number_added = true;
+        }
+    }
+    setInterval(add_row_number, 2000);
 
     $("#step_one_form").submit(function (e) {
         e.preventDefault();
@@ -210,6 +238,7 @@ $(function () {
                     $("#qns_table").load(location.href + " #qns_table");
                     $("#multi_choice_form")[0].reset();
                     $("#multi_choice_form .formsms").html('');
+                    row_number_added = false;
                 } else {
                     var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
                     $("#multi_choice_form .formsms").html(fdback);
@@ -225,60 +254,74 @@ $(function () {
         e.preventDefault();
 
         var short_long_labels = [];
+        var short_labels_array = [];
         $("#verbose_label_form table tbody tr").each(function() {
             var short_label = $.trim($(this).find('td .l_short').val());
             var long_label = $.trim($(this).find('td .l_long').val());
             if ((short_label.length == 1) && (long_label.length > 2)) {
-                short_long_labels.push({'short': short_label, 'long': long_label});
+                short_long_labels.push({'short': short_label.toUpperCase(), 'long': long_label});
+                short_labels_array.push(short_label);
             }
         });
 
-        if (short_long_labels.length > 0) {
-            var formdata = new FormData();
-            formdata.append('questions', JSON.stringify(short_long_labels));
-            formdata.append('qns_type', $('#qn_type_verboselabel').val());
-            formdata.append('qn_number', $('#v_label_num_questions').val());
-            formdata.append('show_labels', $('#v_show_labels').val());
-            formdata.append('step', 5);
-            formdata.append('sheet', $('#custom_sheet_id').val());
-            
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: formdata,
-                dataType: 'json',
-                contentType: false,
-                processData: false,
-                headers: {
-                    'X-CSRFToken': CSRF_TOKEN
-                },
-                beforeSend: function() {
-                    $("#verbose_label_form").html('');
-                    $("#cancel_vlabel_btn").hide();
-                    $("#submit_vlabel_btn").html("Saving <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
-                },
-                success: function(response) {
-                    $("#cancel_vlabel_btn").show();
-                    $("#submit_vlabel_btn").html(`Next <i class="fas fa-long-arrow-right"></i>`).attr('type', 'submit');
+        var duplicate_labels = (input_array) => {
+            const duplicates =input_array.filter((item, index) =>input_array.indexOf(item) !== index);
+            return Array.from(new Set(duplicates));
+        }
 
-                    if (response.success) {
-                        $('#verbose_label_modal').modal('hide');
-                        $("#qns_table").load(location.href + " #qns_table");
-                        $("#verbose_label_form")[0].reset();
-                        $("#verbose_label_form .formsms").html('');
-                    } else {
-                        $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
-                        var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-                        $("#verbose_label_form .formsms").html(fdback);
+        if(duplicate_labels(short_labels_array).length == 0) {
+            if (short_long_labels.length > 1) {
+                var formdata = new FormData();
+                formdata.append('questions', JSON.stringify(short_long_labels));
+                formdata.append('qns_type', $('#qn_type_verboselabel').val());
+                formdata.append('qn_number', $('#v_label_num_questions').val());
+                formdata.append('show_labels', $('#v_show_labels').val());
+                formdata.append('step', 5);
+                formdata.append('sheet', $('#custom_sheet_id').val());
+                
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: formdata,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    beforeSend: function() {
+                        $("#verbose_label_form").html('');
+                        $("#cancel_vlabel_btn").hide();
+                        $("#submit_vlabel_btn").html("Saving <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
+                    },
+                    success: function(response) {
+                        $("#cancel_vlabel_btn").show();
+                        $("#submit_vlabel_btn").html(`Next <i class="fas fa-long-arrow-right"></i>`).attr('type', 'submit');
+    
+                        if (response.success) {
+                            $('#verbose_label_modal').modal('hide');
+                            $("#qns_table").load(location.href + " #qns_table");
+                            $("#verbose_label_form")[0].reset();
+                            $("#verbose_label_form .formsms").html('');
+                            row_number_added = false;
+                        } else {
+                            $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
+                            var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+                            $("#verbose_label_form .formsms").html(fdback);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.log(error);
-                }
-            });
+                });
+            } else {
+                $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
+                var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> Please enter atleast 2 verbose labels. <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+                $("#verbose_label_form .formsms").html(fdback);
+            }
         } else {
             $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
-            var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> Please enter atleast 1 verbose label. <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+            var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> Short labels should be unique in each field. <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
             $("#verbose_label_form .formsms").html(fdback);
         }
     });
@@ -316,6 +359,7 @@ $(function () {
                     $("#qns_table").load(location.href + " #qns_table");
                     $("#verbose_questions_form")[0].reset();
                     $("#verbose_questions_form .formsms").html('');
+                    row_number_added = false;
                 } else {
                     var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
                     $("#verbose_questions_form .formsms").html(fdback);
@@ -326,8 +370,84 @@ $(function () {
             }
         });
     });
+    
+    $('#publish_sheet_form').on('click', '#remove_qns_btn', function(e) {
+        e.preventDefault();
+        if (remove_questions) {
+            var questions_to_remove = [];
+            var current_row_id = '';
+            var current_row_count = 0;
+            var row_index_array = [];
+            $("#qns_table tbody tr").each(function (index, element) {
+                if((index <= (row_count-2)) && $(this).find('td:nth-child(4) input').is(':checked')) {
+                    row_index_array.push(index);
+                    var tr_class = $(this).attr('class');
+                    if(current_row_id == tr_class) {
+                        current_row_count++;
+                    } else {
+                        if((current_row_count > 0) && current_row_id !== '') {
+                            questions_to_remove.push({
+                                'id': parseInt(current_row_id.split('_')[1]),
+                                'qns': current_row_count
+                            });
+                        }
+                        current_row_id = tr_class;
+                        current_row_count = 1;
+                    }
+                }
+            });
+            if((current_row_count > 0) && current_row_id !== '') {
+                questions_to_remove.push({
+                    'id': parseInt(current_row_id.split('_')[1]),
+                    'qns': current_row_count
+                });
 
-    $("#publish_sheet_form").submit(function (e) {
+                
+                var formdata = new FormData();
+                formdata.append('questions', JSON.stringify(questions_to_remove));
+                formdata.append('step', 7);
+                
+                $.ajax({
+                    type: 'POST',
+                    url: $("#publish_sheet_form").attr('action'),
+                    data: formdata,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    beforeSend: function() {
+                        remove_questions = false;
+                        $("#remove_qns_btn").html("<i class='fas fa-spinner fa-pulse'></i> Removing");
+                    },
+                    success: function(response) {
+                        $("#remove_qns_btn").html(`<i class="fas fa-trash"></i> Remove selected`);
+                        if (response.success) {
+                            $("#qns_table tbody tr").each(function (index, element) {
+                                if(row_index_array.includes(index)) {
+                                    $(this).remove();
+                                }
+                            });
+                            row_number_added = false;
+                        } else {
+                            var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+                            $("#publish_sheet_form .formsms").html(fdback);
+                        }
+                        remove_questions = true
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            } else {
+                var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> Select atleast one question to remove. <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+                $("#publish_sheet_form .formsms").html(fdback);
+            }
+        }
+    });
+
+    $("#publish_confirm_form").submit(function (e) {
         e.preventDefault();
 
         var formdata = new FormData();
@@ -336,7 +456,7 @@ $(function () {
         
         $.ajax({
             type: 'POST',
-            url: $(this).attr('action'),
+            url: $("#publish_sheet_form").attr('action'),
             data: formdata,
             dataType: 'json',
             contentType: false,
@@ -345,17 +465,17 @@ $(function () {
                 'X-CSRFToken': CSRF_TOKEN
             },
             beforeSend: function() {
-                $("#cancel_publish_btn").hide();
-                $("#publish_btn").html("Publishing <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
+                $("#publish_cancel_btn").hide();
+                $("#publish_confirm_btn").html("Publishing <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
             },
             success: function(response) {
                 if (response.success) {
                     window.location.href = response.url;
                 } else {
-                    $("#cancel_publish_btn").show();
-                    $("#publish_btn").html(`Publish <i class="fas fa-check-circle"></i>`).attr('type', 'submit');
+                    $("#publish_cancel_btn").show();
+                    $("#publish_confirm_btn").html(`Publish <i class="fas fa-check-circle"></i>`).attr('type', 'submit');
                     var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-                    $("#verbose_questions_form .formsms").html(fdback);
+                    $("#publish_confirm_form .formsms").html(fdback);
                 }
             },
             error: function(xhr, status, error) {

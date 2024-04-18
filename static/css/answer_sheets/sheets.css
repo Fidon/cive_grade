@@ -109,10 +109,11 @@
 
 #contents form.form_step4 {
     width: 35%;
+    display: inline-block;
 }
 #contents table.answerstable {
-    width: 60%;
-    display: none;
+    width: 64%;
+    float: right;
 }
 #contents table.answerstable td span {
     display: inline-block;
