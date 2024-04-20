@@ -5,6 +5,7 @@
 {% endblock %}
 {% block styles %}
   <link href="{% static 'css/answer_sheets/sheets.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'css/answer_sheets/print_sheet.css' %}" rel="stylesheet" type="text/css" media="print" />
 {% endblock %}
 {% block contents %}
   {% if custom_form %}
@@ -422,10 +423,16 @@
         </div>
       </form>
 
-      {% comment %}answer-sheet table for preview{% endcomment %}
-      <table class="table my-5 text-ttxt table-bordered answerstable" id="answers_paper_table">
-        <tbody></tbody>
-      </table>
+      {% comment %} answer-sheet table for preview {% endcomment %}
+      <div class="answerstable my-5 p-1 table-responsive">
+        <input type="hidden" id="header_boxes_input" value="{{ header_boxes }}">
+        <input type="hidden" id="id_section_input" value="{{ id_section }}">
+        <input type="hidden" id="keys_section_input" value="{{ keys_section }}">
+        <table id="answers_paper_table">
+          <tbody>
+          </tbody>
+        </table>
+      </div>
 
       {% comment %}modal to add multi-choice question{% endcomment %}
       <div class="modal fade" id="multi_choice_modal">

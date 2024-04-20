@@ -29,15 +29,15 @@ def answer_sheets_page(request, step=None, sheet=None):
             c_sheet = CustomSheet.objects.filter(teacher=request.user, published=False).order_by('-id').first()
             step1_names = c_sheet.names
             sheet = c_sheet.id
-        if step == 2 and HeaderBoxes.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
+        if sheet is not None and HeaderBoxes.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
             hd_boxes = HeaderBoxes.objects.get(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False)
             header_boxes = hd_boxes.contents
             sizes = [{'short': 's', 'long': 'Small'}, {'short': 'm', 'long': 'Medium'}, {'short': 'l', 'long': 'Large'}]
-        if step == 3 and StudentKeys.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
+        if sheet is not None and StudentKeys.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
             studentkeys = StudentKeys.objects.get(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False)
             id_section = studentkeys.contents[0]
             keys_section = studentkeys.contents[1]
-        if step == 4 and Questions.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
+        if sheet is not None and Questions.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
             sheet_questions = Questions.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).order_by('id')
             for qns in sheet_questions:
                 questions_list.append({
@@ -47,7 +47,7 @@ def answer_sheets_page(request, step=None, sheet=None):
                     'qns': qns.questions,
                     'show': qns.show_labels if qns.show_labels else None
                 })
-            
+    
         context = {
             'custom_form': True,
             'step': step,
@@ -62,6 +62,7 @@ def answer_sheets_page(request, step=None, sheet=None):
             'id_section': id_section,
             'keys_section': keys_section,
             'questions_list': questions_list,
+            'table_columns': range(1, 34),
         }
         return render(request, 'answer_sheets/select_sheets.html', context=context)
     return render(request, 'answer_sheets/select_sheets.html')

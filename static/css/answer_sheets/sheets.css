@@ -106,18 +106,30 @@
     width: 20px;
     height: 20px;
 }
-
 #contents form.form_step4 {
     width: 35%;
     display: inline-block;
 }
-#contents table.answerstable {
+#contents div.answerstable {
     width: 64%;
     float: right;
+    min-height: 500px;
+    color: #696969;
 }
-#contents table.answerstable td span {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    background-color: #696969;
+#contents .answerstable table {
+    table-layout: fixed;
+    display: block;
+    width: 100%;
+}
+#contents .answerstable table tbody tr td {
+    width: 32px;
+    max-width: 32px;
+    height: 32px;
+    padding: 1px;
+    text-align: left;
+    border: 1px solid rgba(105, 105, 105, .1);
+    border-collapse: collapse;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

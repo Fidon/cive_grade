@@ -43,6 +43,7 @@ body * {
 
 
 #container header {
+    display: block;
     position: fixed;
     left: 0;
     top: 0;
@@ -52,11 +53,11 @@ body * {
 #container header .divbars {
     width: 50%;
     float: left;
-    padding: 10px 0;
+    padding: 8px 0;
 }
 #container header .divlogo img {
     display: inline-block;
-    width: 90px;
+    width: 95px;
     margin-left: 15px;
 }
 #container header .divbars span {
@@ -73,7 +74,7 @@ body * {
 }
 
 #container .main {
-    margin-top: 96px;
+    margin-top: 112px;
     display: flex;
     width: 100%;
 }

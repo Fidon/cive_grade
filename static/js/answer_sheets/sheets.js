@@ -4,6 +4,12 @@ $(function () {
     var remove_questions = true;
     var row_number_added = false;
 
+    // parse string into js object/array
+    function parseInput(inputId) {
+        var input = $(inputId).val().replace(/'/g, '"').replace(/True/g, 'true').replace(/False/g, 'false');
+        return JSON.parse(input);
+    }
+
     function add_row_number() {
         if (row_number_added == false) {
             row_count = $("#qns_table tbody tr").length;
@@ -14,16 +20,155 @@ $(function () {
             });
 
             // answer sheet table
+            var header_boxes = parseInput("#header_boxes_input");
+            var id_section = parseInput("#id_section_input");
+            // var keys_section = parseInput("#keys_section_input");
             var num_rows = Math.ceil(row_count/2);
             var table_contents = ``;
-            for (let i=0; i<num_rows; i++) {
+            var start_new_row = true;
+            var current_active_row = undefined;
+
+            if (id_section.id_status) {
                 table_contents += `<tr>`;
-                for (let j=0; j<=13; j++) {
-                    table_contents += `<td>${j+1}</td>`;
+                table_contents += `<td class="student_id" colspan="3">${id_section.id_labels}:</td>`;
+                for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                table_contents += `</tr>`;
+                $("#answers_paper_table tbody").append(table_contents);
+                table_contents = ``;
+            }
+
+            if (header_boxes[0].enabled) {
+                table_contents += `<tr>`;
+                table_contents += `<td class="student_name" colspan="3">${header_boxes[0].label}:</td>`;
+                for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                table_contents += `</tr>`;
+                $("#answers_paper_table tbody").append(table_contents);
+                table_contents = ``;
+            }
+
+            if (header_boxes[1].enabled) {
+                table_contents += `<tr>`;
+                table_contents += `<td class="student_exam" colspan="2">${header_boxes[1].label}:</td>`;
+                for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                table_contents += `</tr>`;
+                $("#answers_paper_table tbody").append(table_contents);
+                table_contents = ``;
+                current_active_row = $('#answers_paper_table tbody tr:has(td.student_exam)');
+                start_new_row = false;
+            }
+
+            if (header_boxes[2].enabled) {
+                if (start_new_row) {
+                    table_contents += `<tr>`;
+                    table_contents += `<td class="student_class" colspan="2">${header_boxes[2].label}:</td>`;
+                    for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                    table_contents += `</tr>`;
+                    $("#answers_paper_table tbody").append(table_contents);
+                    table_contents = ``;
+                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_class)');
+                    start_new_row = false;
+                } else {
+                    $(current_active_row.find("td")).each(function (index, element) {
+                        if (index == 15) {
+                            $(this).attr('class', 'student_class');
+                            $(this).attr('colspan', '2');
+                            $(this).text(header_boxes[2].label+':');
+                            return false;
+                        }
+                    });
+                    current_active_row = undefined;
+                    start_new_row = true;
+                }
+            }
+
+            if (header_boxes[3].enabled) {
+                if (start_new_row) {
+                    table_contents += `<tr>`;
+                    table_contents += `<td class="student_item1" colspan="2">${header_boxes[3].label}:</td>`;
+                    for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                    table_contents += `</tr>`;
+                    $("#answers_paper_table tbody").append(table_contents);
+                    table_contents = ``;
+                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_item1)');
+                    start_new_row = false;
+                } else {
+                    $(current_active_row.find("td")).each(function (index, element) {
+                        if (index == 15) {
+                            $(this).attr('class', 'student_item1');
+                            $(this).attr('colspan', '2');
+                            $(this).text(header_boxes[3].label+':');
+                            return false;
+                        }
+                    });
+                    current_active_row = undefined;
+                    start_new_row = true;
+                }
+            }
+
+            if (header_boxes[4].enabled) {
+                if (start_new_row) {
+                    table_contents += `<tr>`;
+                    table_contents += `<td class="student_item2" colspan="2">${header_boxes[4].label}:</td>`;
+                    for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                    table_contents += `</tr>`;
+                    $("#answers_paper_table tbody").append(table_contents);
+                    table_contents = ``;
+                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_item2)');
+                    start_new_row = false;
+                } else {
+                    $(current_active_row.find("td")).each(function (index, element) {
+                        if (index == 15) {
+                            $(this).attr('class', 'student_item2');
+                            $(this).attr('colspan', '2');
+                            $(this).text(header_boxes[4].label+':');
+                            return false;
+                        }
+                    });
+                    current_active_row = undefined;
+                    start_new_row = true;
+                }
+            }
+
+            if (header_boxes[5].enabled) {
+                if (start_new_row) {
+                    table_contents += `<tr>`;
+                    table_contents += `<td class="student_item3" colspan="2">${header_boxes[5].label}:</td>`;
+                    for (let j=0; j<32; j++) { table_contents += `<td></td>`; }
+                    table_contents += `</tr>`;
+                    $("#answers_paper_table tbody").append(table_contents);
+                    table_contents = ``;
+                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_item3)');
+                    start_new_row = false;
+                } else {
+                    $(current_active_row.find("td")).each(function (index, element) {
+                        if (index == 15) {
+                            $(this).attr('class', 'student_item3');
+                            $(this).attr('colspan', '2');
+                            $(this).text(header_boxes[5].label+':');
+                            return false;
+                        }
+                    });
+                    current_active_row = undefined;
+                    start_new_row = true;
+                }
+            }
+
+            table_contents += `<tr>`;
+            for (let j=0; j<32; j++) {table_contents += `<td class="border-0"></td>`;}
+            table_contents += `</tr>`;
+
+            for (let i=0; i<num_rows+12; i++) {
+                table_contents += `<tr>`;
+                for (let j=0; j<=33; j++) {
+                    if (j == 0) {
+                        table_contents += `<td class="text-center">${i+1}</td>`;
+                    } else {
+                        table_contents += `<td></td>`;
+                    }
                 }
                 table_contents += `</tr>`;
             }
-            $("#answers_paper_table tbody").html(table_contents);
+            $("#answers_paper_table tbody").append(table_contents);
             row_number_added = true;
         }
     }

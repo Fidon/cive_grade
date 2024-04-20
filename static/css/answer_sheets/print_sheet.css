@@ -1,0 +1,23 @@
+#navbar,
+#menucanvas,
+#container header,
+#container .main nav,
+#container footer {
+    display: none;
+}
+#container .main {
+    margin-top: 0;
+}
+
+#contents form,
+#contents form.form_step4 {
+    display: none;
+}
+#contents div.answerstable {
+    display: block;
+    width: 100%;
+    float: left;
+    height: auto;
+    max-height: 1400px;
+    overflow: hidden;
+}
