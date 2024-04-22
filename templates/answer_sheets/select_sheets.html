@@ -355,7 +355,7 @@
                 {% for question in qns.range %}
                   {% if qns.type == 'multichoice' %}
                     <tr class="tr_{{ qns.id }}">
-                      <td></td>
+                      <td class="{{ qns.type }}"></td>
                       {% if qns.qns.qn_type == 1 %}
                         <td class="text-start">Internal labels</td>
                       {% else %}
@@ -370,7 +370,7 @@
                     </tr>
                   {% elif qns.type == 'verboselabel' %}
                     <tr class="tr_{{ qns.id }}">
-                      <td></td>
+                      <td class="{{ qns.type }}"></td>
                       <td class="text-start">Verbose labels</td>
                       <td class="text-start">
                         <ul>
@@ -387,7 +387,7 @@
                     </tr>
                   {% elif qns.type == 'verboseqns' %}
                     <tr class="tr_{{ qns.id }}">
-                      <td></td>
+                      <td class="{{ qns.type }}"></td>
                       <td class="text-start">Verbose questions</td>
                       <td class="text-start">Max chars: {{ qns.qns.chars }}</td>
                       <td>
@@ -423,14 +423,13 @@
         </div>
       </form>
 
-      {% comment %} answer-sheet table for preview {% endcomment %}
-      <div class="answerstable my-5 p-1 table-responsive">
-        <input type="hidden" id="header_boxes_input" value="{{ header_boxes }}">
-        <input type="hidden" id="id_section_input" value="{{ id_section }}">
-        <input type="hidden" id="keys_section_input" value="{{ keys_section }}">
+      {% comment %}answer-sheet table for preview{% endcomment %}
+      <div class="answerstable table-responsive">
+        <input type="hidden" id="header_boxes_input" value="{{ header_boxes }}" />
+        <input type="hidden" id="id_section_input" value="{{ id_section }}" />
+        <input type="hidden" id="keys_section_input" value="{{ keys_section }}" />
         <table id="answers_paper_table">
-          <tbody>
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
 
@@ -460,7 +459,7 @@
                 <label class="form-label text-ttxt1" for="multi_questions">Select number of questions</label>
               </div>
               <div class="form-floating d-block w-100 float-start mt-1">
-                <input type="text" maxlength="10" minlength="2" class="form-control text-ttxt1" id="multi_labels" value="ABCDE" placeholder="d" required />
+                <input type="text" maxlength="10" minlength="2" class="form-control text-ttxt1" id="multi_labels" pattern="[A-Za-z]+" value="ABCDE" placeholder="d" required />
                 <label for="multi_labels" class="form-label text-ttxt1">Answer labels</label>
               </div>
             </div>
@@ -511,7 +510,7 @@
                     {% for lb in v_labels %}
                       <tr>
                         <td style="width:30px;">
-                          <input type="text" maxlength="1" minlength="1" class="l_short form-control text-ttxt1" />
+                          <input type="text" maxlength="1" minlength="1" pattern="[A-Za-z]+" class="l_short form-control text-ttxt1" />
                         </td>
                         <td>
                           <input type="text" minlength="3" class="l_long form-control text-ttxt1" />
@@ -568,7 +567,7 @@
         </form>
       </div>
 
-      {% comment %}modal to confirm publishing answer sheet {% endcomment %}
+      {% comment %}modal to confirm publishing answer sheet{% endcomment %}
       <div class="modal fade" id="confirm_publish_modal">
         <div class="modal-dialog">
           <form class="modal-content" id="publish_confirm_form">
@@ -579,7 +578,7 @@
             <div class="modal-body">
               <div class="formsms w-100 float-start text-start my-1"></div>
               <div class="form-floating d-block w-100 float-start my-4 px-2">
-                You're about to publish <b>{{ sheet_name }}</b> answer sheet;<br>you won't be able to do any further modifications.<br>Are you sure to continue..?
+                You're about to publish <b>{{ sheet_name }}</b> answer sheet;<br />you won't be able to do any further modifications.<br />Are you sure to continue..?
               </div>
             </div>
             <div class="modal-footer">

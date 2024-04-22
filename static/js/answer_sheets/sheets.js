@@ -4,6 +4,10 @@ $(function () {
     var remove_questions = true;
     var row_number_added = false;
 
+    function isNumber(value) {
+        return /^\d+$/.test(value);
+    }
+
     // parse string into js object/array
     function parseInput(inputId) {
         var input = $(inputId).val().replace(/'/g, '"').replace(/True/g, 'true').replace(/False/g, 'false');
@@ -28,28 +32,41 @@ $(function () {
             var start_new_row = true;
             var current_active_row = undefined;
 
+            table_contents += `<tr>`;
+            for (let j=0; j<=17; j++) {
+                if (j == 0) {
+                    table_contents += `<td class="text-center border-0"><div></div></td>`;
+                } else if (j == 17) {
+                    table_contents += `<td class="text-center border-0"><div></div></td>`;
+                } else {
+                    table_contents += `<td class="border-0"></td>`;
+                }
+            }
+            table_contents += `<tr>`;
+
+
             if (id_section.id_status) {
-                table_contents += `<tr>`;
+                table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
                 table_contents += `<td class="student_id" colspan="3">${id_section.id_labels}:</td>`;
-                for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                for (let j=0; j<=12; j++) { table_contents += `<td></td>`; }
                 table_contents += `</tr>`;
                 $("#answers_paper_table tbody").append(table_contents);
                 table_contents = ``;
             }
 
             if (header_boxes[0].enabled) {
-                table_contents += `<tr>`;
-                table_contents += `<td class="student_name" colspan="3">${header_boxes[0].label}:</td>`;
-                for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
+                table_contents += `<td class="student_name" colspan="2">${header_boxes[0].label}:</td>`;
+                for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
                 table_contents += `</tr>`;
                 $("#answers_paper_table tbody").append(table_contents);
                 table_contents = ``;
             }
 
             if (header_boxes[1].enabled) {
-                table_contents += `<tr>`;
+                table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
                 table_contents += `<td class="student_exam" colspan="2">${header_boxes[1].label}:</td>`;
-                for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
                 table_contents += `</tr>`;
                 $("#answers_paper_table tbody").append(table_contents);
                 table_contents = ``;
@@ -59,9 +76,9 @@ $(function () {
 
             if (header_boxes[2].enabled) {
                 if (start_new_row) {
-                    table_contents += `<tr>`;
+                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
                     table_contents += `<td class="student_class" colspan="2">${header_boxes[2].label}:</td>`;
-                    for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
                     table_contents += `</tr>`;
                     $("#answers_paper_table tbody").append(table_contents);
                     table_contents = ``;
@@ -69,10 +86,11 @@ $(function () {
                     start_new_row = false;
                 } else {
                     $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 15) {
+                        if (index == 8) {
                             $(this).attr('class', 'student_class');
                             $(this).attr('colspan', '2');
                             $(this).text(header_boxes[2].label+':');
+                            $(this).next('td').remove();
                             return false;
                         }
                     });
@@ -83,9 +101,9 @@ $(function () {
 
             if (header_boxes[3].enabled) {
                 if (start_new_row) {
-                    table_contents += `<tr>`;
+                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
                     table_contents += `<td class="student_item1" colspan="2">${header_boxes[3].label}:</td>`;
-                    for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
                     table_contents += `</tr>`;
                     $("#answers_paper_table tbody").append(table_contents);
                     table_contents = ``;
@@ -93,9 +111,10 @@ $(function () {
                     start_new_row = false;
                 } else {
                     $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 15) {
+                        if (index == 8) {
                             $(this).attr('class', 'student_item1');
                             $(this).attr('colspan', '2');
+                            $(this).next('td').remove();
                             $(this).text(header_boxes[3].label+':');
                             return false;
                         }
@@ -107,9 +126,9 @@ $(function () {
 
             if (header_boxes[4].enabled) {
                 if (start_new_row) {
-                    table_contents += `<tr>`;
+                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
                     table_contents += `<td class="student_item2" colspan="2">${header_boxes[4].label}:</td>`;
-                    for (let j=0; j<=30; j++) { table_contents += `<td></td>`; }
+                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
                     table_contents += `</tr>`;
                     $("#answers_paper_table tbody").append(table_contents);
                     table_contents = ``;
@@ -117,9 +136,10 @@ $(function () {
                     start_new_row = false;
                 } else {
                     $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 15) {
+                        if (index == 8) {
                             $(this).attr('class', 'student_item2');
                             $(this).attr('colspan', '2');
+                            $(this).next('td').remove();
                             $(this).text(header_boxes[4].label+':');
                             return false;
                         }
@@ -131,9 +151,9 @@ $(function () {
 
             if (header_boxes[5].enabled) {
                 if (start_new_row) {
-                    table_contents += `<tr>`;
+                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
                     table_contents += `<td class="student_item3" colspan="2">${header_boxes[5].label}:</td>`;
-                    for (let j=0; j<32; j++) { table_contents += `<td></td>`; }
+                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
                     table_contents += `</tr>`;
                     $("#answers_paper_table tbody").append(table_contents);
                     table_contents = ``;
@@ -141,9 +161,10 @@ $(function () {
                     start_new_row = false;
                 } else {
                     $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 15) {
+                        if (index == 8) {
                             $(this).attr('class', 'student_item3');
                             $(this).attr('colspan', '2');
+                            $(this).next('td').remove();
                             $(this).text(header_boxes[5].label+':');
                             return false;
                         }
@@ -152,24 +173,182 @@ $(function () {
                     start_new_row = true;
                 }
             }
-
-            table_contents += `<tr>`;
-            for (let j=0; j<32; j++) {table_contents += `<td class="border-0"></td>`;}
-            table_contents += `</tr>`;
-
-            for (let i=0; i<num_rows+12; i++) {
-                table_contents += `<tr>`;
-                for (let j=0; j<=33; j++) {
-                    if (j == 0) {
-                        table_contents += `<td class="text-center">${i+1}</td>`;
-                    } else {
-                        table_contents += `<td></td>`;
-                    }
-                }
-                table_contents += `</tr>`;
-            }
             $("#answers_paper_table tbody").append(table_contents);
+            table_contents = ``;
+
+            var start_new_answers_row = true;
+            var rows_left = 29;
+            $("#qns_table tbody tr").each(function (index, element) {
+                if(!($(this).attr('id') == "select_qns_tr")) {
+                    var question_type = $(this).find('td:nth-child(1)').attr('class');
+                    var question_number = $(this).find('td:nth-child(1)').text();
+                    var question_labels = "";
+                    var remaining_cols = 0;
+                    
+                    if (question_type == "multichoice") {
+                        question_labels = $(this).find('td:nth-child(3)').text();
+                        remaining_cols = 15 - question_labels.length;
+                        if (start_new_answers_row) {
+                            table_contents += `<tr><td class="border-0"></td><td><b>${question_number}</b></td>`;
+                            for (let i=0; i<question_labels.length; i++) {
+                                table_contents += `<td>${question_labels[i]}</td>`;
+                            }
+                            for (let j=0; j<remaining_cols; j++) {table_contents += `<td></td>`; }
+                            table_contents += `</tr>`;
+                        } else {
+                            $("#answers_paper_table tbody tr").each(function () {
+                                if ($(this).attr('class') !== "header_tr") {
+                                    var row = $(this);
+                                    var blank_row = true;
+                                    var col_start = 10;
+
+                                    row.find('td').each(function(idx, el) {
+                                        if (idx < 9 && $(el).attr('colspan')) {
+                                            col_start = 5;
+                                            return false;
+                                        }
+                                    });
+
+                                    row.find("td:nth-child(n+"+col_start+"):nth-child(-n+17)").each(function (index, col) {
+                                        if ($(col).text() !== "") { blank_row = false; }
+                                    });
+
+                                    if (blank_row) {
+                                        row.find("td:nth-child("+col_start+")").attr('class', 'text-center').html(`<b>${question_number}</b>`);
+                                        for (let i=0; i<question_labels.length; i++) {
+                                            row.find("td:nth-child("+(col_start+1+i)+")").attr('class', 'text-center').text(question_labels[i]);
+                                        }
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+                    } else if (question_type == "verboselabel") {
+                        var label_list = [];
+                        question_labels = $(this).find('td:nth-child(3) li');
+                        remaining_cols = 15 - question_labels.length;
+                        question_labels.each(function(index) { label_list.push($(this).text()); });
+                        if (start_new_answers_row) {
+                            table_contents += `<tr><td class="border-0"></td><td><b>${question_number}</b></td>`;
+                            table_contents += `<td>${label_list[0].split(": ")[0]}</td><td colspan="6" class="text-start ps-1">${label_list[0].split(": ")[1]}</td>`;
+                            for (let z=0; z<8; z++) { table_contents += `<td></td>`; }
+                            table_contents += `</tr>`;
+                            for(let x=1; x<question_labels.length; x++) {
+                                table_contents += `<tr><td class="border-0"></td><td></td>`;
+                                table_contents += `<td>${label_list[x].split(": ")[0]}</td><td colspan="6" class="text-start ps-1">${label_list[x].split(": ")[1]}</td>`;
+                                for (let y=0; y<8; y++) { table_contents += `<td></td>`; }
+                                table_contents += `</tr>`;
+                            }
+                        } else {
+                            $("#answers_paper_table tbody tr").each(function (id, elmt) {
+                                if (($(elmt).attr('class') !== 'header_tr') && (id > 1)) {
+                                    var row = $(this);
+                                    var blank_row = true;
+                                    var col_start = 10;
+
+                                    row.find('td[colspan="6"]').each(function(col_idx, col_el) {
+                                        if ($(col_el).index() == 3) { col_start = 5; }
+                                        return false;
+                                    });
+
+                                    row.find("td:nth-child(n+"+col_start+"):nth-child(-n+17)").each(function (index, col) {
+                                        if ($(col).text() !== "") { blank_row = false; }
+                                    });
+
+                                    if (blank_row) {
+                                        row.find("td:nth-child("+col_start+")").attr('class', 'text-center').html(`<b>${question_number}</b>`);
+                                        row.find("td:nth-child("+(col_start+1)+")")
+                                        .attr('class', 'text-center').html(label_list[0].split(": ")[0]);
+                                        row.find("td:nth-child("+(col_start+2)+")")
+                                        .attr('class', 'text-start ps-1').attr('colspan', '6').html(label_list[0].split(": ")[1]);
+                                        for(let a=0; a<=4; a++) { row.find("td:nth-child("+(col_start+3)+")").remove(); }
+
+                                        var nextRow = row.next();
+                                        for(let x=1; x<question_labels.length; x++) {
+                                            col_start = 10;
+                                            nextRow.find('td[colspan="6"]').each(function(col_idx, col_el) {
+                                                if ($(col_el).index() == 3) { col_start = 5; }
+                                                return false;
+                                            });
+
+                                            nextRow.find("td:nth-child("+(col_start+1)+")")
+                                            .attr('class', 'text-center').html(label_list[x].split(": ")[0]);
+                                            nextRow.find("td:nth-child("+(col_start+2)+")")
+                                            .attr('class', 'text-start ps-1').attr('colspan', '6').html(label_list[x].split(": ")[1]);
+                                            for(let b=0; b<=4; b++) { nextRow.find("td:nth-child("+(col_start+3)+")").remove(); }
+                                            nextRow = nextRow.next();
+                                        }
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        question_labels = parseInt($(this).find('td:nth-child(3)').text().split(": ")[1]);
+                        remaining_cols = 15 - question_labels;
+                        if (start_new_answers_row) {
+                            table_contents += `<tr><td class="border-0"></td><td><b>${question_number}</b></td>`;
+                            for (let z=0; z<question_labels+remaining_cols; z++) { table_contents += `<td></td>`; }
+                            table_contents += `</tr>`;
+                        } else {
+                            $("#answers_paper_table tbody tr").each(function (id, elmt) {
+                                if (($(elmt).attr('class') !== 'header_tr') && (id > 1)) {
+                                    var row = $(this);
+                                    var blank_row = true;
+                                    var col_start = 10;
+
+                                    row.find('td[colspan="6"]').each(function(col_idx, col_el) {
+                                        if ($(col_el).index() == 3) { col_start = 5; }
+                                        return false;
+                                    });
+
+                                    row.find("td:nth-child(n+"+col_start+"):nth-child(-n+17)").each(function (index, col) {
+                                        if ($(col).text() !== "") { blank_row = false; }
+                                    });
+
+                                    if (blank_row) {
+                                        row.find("td:nth-child("+col_start+")").attr('class', 'text-center').html(`<b>${question_number}</b>`);
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    $("#answers_paper_table tbody").append(table_contents);
+                    table_contents = ``;
+                    start_new_answers_row = (rows_left - $("#answers_paper_table tbody tr").length > 0) ? true : false;
+                }
+            });
+
+
+            // for (let i=0; i<=19; i++) {
+            //     table_contents += `<tr><td class="border-0"></td>`;
+            //     for (let j=0; j<=15; j++) {
+            //         if (j == 0) {
+            //             table_contents += `<td class="text-center"><b>${i+1}</b></td>`;
+            //         } else {
+            //             table_contents += `<td></td>`;
+            //         }
+            //     }
+            //     table_contents += `</tr>`;
+            // }
+
+            table_contents += `<tr id="last_tr">`;
+            for (let j=0; j<=17; j++) {
+                if (j == 0) {
+                    table_contents += `<td class="text-center border-0"><div></div></td>`;
+                } else if (j == 17) {
+                    table_contents += `<td class="text-center border-0"><div></div></td>`;
+                } else {
+                    table_contents += `<td class="border-0"></td>`;
+                }
+            }
+            table_contents += `<tr>`;
+
+            $("#answers_paper_table tbody").append(table_contents);
+            table_contents = ``;
             row_number_added = true;
+            // alert($("#answers_paper_table tbody tr").length);
         }
     }
     setInterval(add_row_number, 2000);

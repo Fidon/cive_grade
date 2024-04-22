@@ -2,22 +2,22 @@
 #menucanvas,
 #container header,
 #container .main nav,
-#container footer {
+#container footer,
+#contents form,
+#contents form.form_step4 {
     display: none;
 }
 #container .main {
     margin-top: 0;
 }
-
-#contents form,
-#contents form.form_step4 {
-    display: none;
+#container {
+    background-color: #FFFFFF;
 }
 #contents div.answerstable {
     display: block;
     width: 100%;
-    float: left;
+    /* height: 1400px; */
     height: auto;
-    max-height: 1400px;
+    float: left;
     overflow: hidden;
 }

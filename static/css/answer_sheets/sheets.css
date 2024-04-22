@@ -113,23 +113,27 @@
 #contents div.answerstable {
     width: 64%;
     float: right;
-    min-height: 500px;
-    color: #696969;
+    height: auto;
+    text-align: center;
 }
 #contents .answerstable table {
     table-layout: fixed;
-    display: block;
-    width: 100%;
+    display: inline-block;
+    width: auto;
 }
 #contents .answerstable table tbody tr td {
     width: 32px;
     max-width: 32px;
     height: 32px;
     padding: 1px;
-    text-align: left;
-    border: 1px solid rgba(105, 105, 105, .1);
+    color: #696969;
+    border: 1px solid rgba(105, 105, 105, .3);
     border-collapse: collapse;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+#contents .answerstable table tbody tr td div {
+    display: inline-block;
+    border: 4px solid #2D2D2D;
 }

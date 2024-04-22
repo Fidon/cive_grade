@@ -55,7 +55,7 @@ def answer_sheets_page(request, step=None, sheet=None):
             'sheet_name': CustomSheet.objects.get(id=sheet) if sheet is not None and step > 0 else "",
             'questions': range(1, 51),
             'v_labels': range(1, 11),
-            'answer_len': range(3, 16),
+            'answer_len': range(3, 8),
             'names': step1_names,
             'header_boxes': header_boxes,
             'sizes': sizes,
