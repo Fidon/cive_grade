@@ -1,12 +1,26 @@
 {% extends 'master.html' %}
 {% load static %}
 {% block title %}
-  Home | CIVE Grade
+  Home | UDOM EMS
 {% endblock %}
 {% block styles %}
   <link href="{% static 'css/home.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block contents %}
+  <table class="table w-50 table-bordered table-striped m-3">
+    {% for row in tabledata %}
+      <tr>
+        <td>{{ row.row_idx }}</td>
+        {% for cell in row.row_data %}
+          {% if cell == None %}
+            <td></td>
+          {% else %}
+            <td>{{ cell }}</td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
   <form id="upload_formm" action="{% url 'upload_majibu' %}" enctype="multipart/form-data" method="post" autocomplete="off" class="d-inline-block w-50 p-5">
     {% csrf_token %}
     <div class="formsms text-start mb-1"></div>

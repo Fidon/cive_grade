@@ -563,6 +563,7 @@ $(function () {
                     $("#multi_choice_form")[0].reset();
                     $("#multi_choice_form .formsms").html('');
                     row_number_added = false;
+                    window.location.reload();
                 } else {
                     var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
                     $("#multi_choice_form .formsms").html(fdback);
@@ -628,6 +629,7 @@ $(function () {
                             $("#verbose_label_form")[0].reset();
                             $("#verbose_label_form .formsms").html('');
                             row_number_added = false;
+                            window.location.reload();
                         } else {
                             $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
                             var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
@@ -684,6 +686,7 @@ $(function () {
                     $("#verbose_questions_form")[0].reset();
                     $("#verbose_questions_form .formsms").html('');
                     row_number_added = false;
+                    window.location.reload();
                 } else {
                     var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
                     $("#verbose_questions_form .formsms").html(fdback);
@@ -754,6 +757,7 @@ $(function () {
                                 }
                             });
                             row_number_added = false;
+                            window.location.reload();
                         } else {
                             var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
                             $("#publish_sheet_form .formsms").html(fdback);

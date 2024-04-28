@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Result</title>
-</head>
-<body>
+    <style>
+      table,
+      table td {
+        border-collapse: collapse;
+        border: 1px solid red;
+      }
+    </style>
+  </head>
+  <body>
     <h1>Table Data</h1>
-    <table border="1">
-        <!-- Loop through each row in the table_data -->
-        {% for row in table_data %}
-            <tr>
-                <!-- Loop through each item in the row -->
-                {% for item in row %}
-                    <!-- Print each item as a table cell -->
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
+    <table>
+      <!-- Loop through each row in the table_data -->
+      {% for row in table_data %}
+        <tr>
+          <!-- Loop through each item in the row -->
+          {% for item in row %}
+            <!-- Print each item as a table cell -->
+            <td>{{ item }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
     </table>
-</body>
+  </body>
 </html>

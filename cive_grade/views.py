@@ -4,11 +4,10 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from datetime import datetime
-from utils.read_answer_sheet import TableExtractor as te, TableLinesRemover as tlr, OcrToTableTool as ott
+from img2table.ocr import TesseractOCR
+from img2table.document import Image
 import os
 import imghdr
-import cv2
-
 
 @never_cache
 @login_required
@@ -34,23 +33,20 @@ def upload_majibu(request):
             for chunk in image.chunks():
                 destination.write(chunk)
 
-        # try:
-        # except Exception as e:
-        #     return JsonResponse({'success': False, 'sms': f'Error processing image: {e}'})
-        
-        table_extractor = te(img_path)
-        perspective_corrected_image = table_extractor.execute()
-        cv2.imshow("perspective_corrected_image", perspective_corrected_image)
 
-        lines_remover = tlr(perspective_corrected_image)
-        image_without_lines = lines_remover.execute()
-        cv2.imshow("image_without_lines", image_without_lines)
-
-        ocr_tool = ott(image_without_lines, perspective_corrected_image)
-        table_data = ocr_tool.execute()
-        # print(table_data[3])
-
-        return render(request, 'result.html', {'table_data': table_data})
+        ocr = TesseractOCR(n_threads=1, lang="eng")
+        doc = Image(img_path)
+        extracted_tables = doc.extract_tables(ocr=ocr, implicit_rows=False, borderless_tables=False, min_confidence=50)
+        table_data = []
+        if extracted_tables:
+            table = extracted_tables[0]
+            for row_idx, row in enumerate(table.content.values()):
+                row_data = []
+                for cell in row:
+                    row_data.append(cell.value)
+                table_data.append({'row_idx': (row_idx+1), 'row_data': row_data})
+                
+        return render(request, 'home.html', {'tabledata': table_data})
     return render(request, 'home.html')
 
 
