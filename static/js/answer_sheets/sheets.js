@@ -23,332 +23,70 @@ $(function () {
                 }
             });
 
-            // answer sheet table
+            var html_contents = ``;
             var header_boxes = parseInput("#header_boxes_input");
-            var id_section = parseInput("#id_section_input");
-            // var keys_section = parseInput("#keys_section_input");
-            var num_rows = Math.ceil(row_count/2);
-            var table_contents = ``;
-            var start_new_row = true;
-            var current_active_row = undefined;
-
-            table_contents += `<tr>`;
-            for (let j=0; j<=17; j++) {
-                if (j == 0) {
-                    table_contents += `<td class="text-center border-0"><div></div></td>`;
-                } else if (j == 17) {
-                    table_contents += `<td class="text-center border-0"><div></div></td>`;
-                } else {
-                    table_contents += `<td class="border-0"></td>`;
-                }
-            }
-            table_contents += `<tr>`;
-
-
-            if (id_section.id_status) {
-                table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
-                table_contents += `<td class="student_id" colspan="3">${id_section.id_labels}:</td>`;
-                for (let j=0; j<=12; j++) { table_contents += `<td></td>`; }
-                table_contents += `</tr>`;
-                $("#answers_paper_table tbody").append(table_contents);
-                table_contents = ``;
-            }
-
+            var box_width = ((header_boxes[2].enabled) && (header_boxes[3].enabled)) ? "w-50" : "w-100";
+            
             if (header_boxes[0].enabled) {
-                table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
-                table_contents += `<td class="student_name" colspan="2">${header_boxes[0].label}:</td>`;
-                for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
-                table_contents += `</tr>`;
-                $("#answers_paper_table tbody").append(table_contents);
-                table_contents = ``;
+                html_contents += `<div class="sheeet_head">` +
+                `<div class="title">Student ID:</div>` +
+                `<div class="id_boxes">`;
+                for (let i=0; i<13; i++) { html_contents += `<span></span>`; }
+                html_contents += `</div></div>`;
             }
-
-            if (header_boxes[1].enabled) {
-                table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
-                table_contents += `<td class="student_exam" colspan="2">${header_boxes[1].label}:</td>`;
-                for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
-                table_contents += `</tr>`;
-                $("#answers_paper_table tbody").append(table_contents);
-                table_contents = ``;
-                current_active_row = $('#answers_paper_table tbody tr:has(td.student_exam)');
-                start_new_row = false;
-            }
-
             if (header_boxes[2].enabled) {
-                if (start_new_row) {
-                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
-                    table_contents += `<td class="student_class" colspan="2">${header_boxes[2].label}:</td>`;
-                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
-                    table_contents += `</tr>`;
-                    $("#answers_paper_table tbody").append(table_contents);
-                    table_contents = ``;
-                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_class)');
-                    start_new_row = false;
-                } else {
-                    $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 8) {
-                            $(this).attr('class', 'student_class');
-                            $(this).attr('colspan', '2');
-                            $(this).text(header_boxes[2].label+':');
-                            $(this).next('td').remove();
-                            return false;
-                        }
-                    });
-                    current_active_row = undefined;
-                    start_new_row = true;
-                }
+                html_contents += `<div class="sheeet_head ${box_width}">` +
+                `<div class="title">Exam:</div>` +
+                `<div class="id_boxes">`;
+                for (let i=0; i<5; i++) { html_contents += `<span></span>`; }
+                html_contents += `</div></div>`;
             }
-
             if (header_boxes[3].enabled) {
-                if (start_new_row) {
-                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
-                    table_contents += `<td class="student_item1" colspan="2">${header_boxes[3].label}:</td>`;
-                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
-                    table_contents += `</tr>`;
-                    $("#answers_paper_table tbody").append(table_contents);
-                    table_contents = ``;
-                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_item1)');
-                    start_new_row = false;
-                } else {
-                    $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 8) {
-                            $(this).attr('class', 'student_item1');
-                            $(this).attr('colspan', '2');
-                            $(this).next('td').remove();
-                            $(this).text(header_boxes[3].label+':');
-                            return false;
-                        }
-                    });
-                    current_active_row = undefined;
-                    start_new_row = true;
-                }
+                html_contents += `<div class="sheeet_head ${box_width}">` +
+                `<div class="title">Class:</div>` +
+                `<div class="id_boxes">`;
+                for (let i=0; i<5; i++) { html_contents += `<span></span>`; }
+                html_contents += `</div></div>`;
             }
-
-            if (header_boxes[4].enabled) {
-                if (start_new_row) {
-                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
-                    table_contents += `<td class="student_item2" colspan="2">${header_boxes[4].label}:</td>`;
-                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
-                    table_contents += `</tr>`;
-                    $("#answers_paper_table tbody").append(table_contents);
-                    table_contents = ``;
-                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_item2)');
-                    start_new_row = false;
-                } else {
-                    $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 8) {
-                            $(this).attr('class', 'student_item2');
-                            $(this).attr('colspan', '2');
-                            $(this).next('td').remove();
-                            $(this).text(header_boxes[4].label+':');
-                            return false;
-                        }
-                    });
-                    current_active_row = undefined;
-                    start_new_row = true;
-                }
+            if (header_boxes[1].enabled) {
+                html_contents += `<div class="sheeet_head m-0">` +
+                `<div class="title">Names:</div>` +
+                `<div class="box"></div></div>`;
             }
+            $('#answers_div').before(html_contents);
 
-            if (header_boxes[5].enabled) {
-                if (start_new_row) {
-                    table_contents += `<tr class="header_tr"><td class="border-0"></td>`;
-                    table_contents += `<td class="student_item3" colspan="2">${header_boxes[5].label}:</td>`;
-                    for (let j=0; j<=13; j++) { table_contents += `<td></td>`; }
-                    table_contents += `</tr>`;
-                    $("#answers_paper_table tbody").append(table_contents);
-                    table_contents = ``;
-                    current_active_row = $('#answers_paper_table tbody tr:has(td.student_item3)');
-                    start_new_row = false;
-                } else {
-                    $(current_active_row.find("td")).each(function (index, element) {
-                        if (index == 8) {
-                            $(this).attr('class', 'student_item3');
-                            $(this).attr('colspan', '2');
-                            $(this).next('td').remove();
-                            $(this).text(header_boxes[5].label+':');
-                            return false;
-                        }
-                    });
-                    current_active_row = undefined;
-                    start_new_row = true;
-                }
-            }
-            $("#answers_paper_table tbody").append(table_contents);
-            table_contents = ``;
-
-            var start_new_answers_row = true;
-            var rows_left = 29;
             $("#qns_table tbody tr").each(function (index, element) {
                 if(!($(this).attr('id') == "select_qns_tr")) {
                     var question_type = $(this).find('td:nth-child(1)').attr('class');
                     var question_number = $(this).find('td:nth-child(1)').text();
                     var question_labels = "";
-                    var remaining_cols = 0;
+                    html_contents = ``;
                     
                     if (question_type == "multichoice") {
                         question_labels = $(this).find('td:nth-child(3)').text();
-                        remaining_cols = 15 - question_labels.length;
-                        if (start_new_answers_row) {
-                            table_contents += `<tr><td class="border-0"></td><td><b>${question_number}</b></td>`;
-                            for (let i=0; i<question_labels.length; i++) {
-                                table_contents += `<td>${question_labels[i]}</td>`;
-                            }
-                            for (let j=0; j<remaining_cols; j++) {table_contents += `<td></td>`; }
-                            table_contents += `</tr>`;
-                        } else {
-                            $("#answers_paper_table tbody tr").each(function () {
-                                if ($(this).attr('class') !== "header_tr") {
-                                    var row = $(this);
-                                    var blank_row = true;
-                                    var col_start = 10;
-
-                                    row.find('td').each(function(idx, el) {
-                                        if (idx < 9 && $(el).attr('colspan')) {
-                                            col_start = 5;
-                                            return false;
-                                        }
-                                    });
-
-                                    row.find("td:nth-child(n+"+col_start+"):nth-child(-n+17)").each(function (index, col) {
-                                        if ($(col).text() !== "") { blank_row = false; }
-                                    });
-
-                                    if (blank_row) {
-                                        row.find("td:nth-child("+col_start+")").attr('class', 'text-center').html(`<b>${question_number}</b>`);
-                                        for (let i=0; i<question_labels.length; i++) {
-                                            row.find("td:nth-child("+(col_start+1+i)+")").attr('class', 'text-center').text(question_labels[i]);
-                                        }
-                                        return false;
-                                    }
-                                }
-                            });
-                        }
+                        html_contents += `<div class="multichoice"><span>${question_number}</span>`;
+                        for (let i=0; i<question_labels.length; i++) { html_contents += `<span>${question_labels[i]}</span>` }
+                        html_contents += `</div>`;
                     } else if (question_type == "verboselabel") {
                         var label_list = [];
                         question_labels = $(this).find('td:nth-child(3) li');
-                        remaining_cols = 15 - question_labels.length;
                         question_labels.each(function(index) { label_list.push($(this).text()); });
-                        if (start_new_answers_row) {
-                            table_contents += `<tr><td class="border-0"></td><td><b>${question_number}</b></td>`;
-                            table_contents += `<td>${label_list[0].split(": ")[0]}</td><td colspan="6" class="text-start ps-1">${label_list[0].split(": ")[1]}</td>`;
-                            for (let z=0; z<8; z++) { table_contents += `<td></td>`; }
-                            table_contents += `</tr>`;
-                            for(let x=1; x<question_labels.length; x++) {
-                                table_contents += `<tr><td class="border-0"></td><td></td>`;
-                                table_contents += `<td>${label_list[x].split(": ")[0]}</td><td colspan="6" class="text-start ps-1">${label_list[x].split(": ")[1]}</td>`;
-                                for (let y=0; y<8; y++) { table_contents += `<td></td>`; }
-                                table_contents += `</tr>`;
-                            }
-                        } else {
-                            $("#answers_paper_table tbody tr").each(function (id, elmt) {
-                                if (($(elmt).attr('class') !== 'header_tr') && (id > 1)) {
-                                    var row = $(this);
-                                    var blank_row = true;
-                                    var col_start = 10;
-
-                                    row.find('td[colspan="6"]').each(function(col_idx, col_el) {
-                                        if ($(col_el).index() == 3) { col_start = 5; }
-                                        return false;
-                                    });
-
-                                    row.find("td:nth-child(n+"+col_start+"):nth-child(-n+17)").each(function (index, col) {
-                                        if ($(col).text() !== "") { blank_row = false; }
-                                    });
-
-                                    if (blank_row) {
-                                        row.find("td:nth-child("+col_start+")").attr('class', 'text-center').html(`<b>${question_number}</b>`);
-                                        row.find("td:nth-child("+(col_start+1)+")")
-                                        .attr('class', 'text-center').html(label_list[0].split(": ")[0]);
-                                        row.find("td:nth-child("+(col_start+2)+")")
-                                        .attr('class', 'text-start ps-1').attr('colspan', '6').html(label_list[0].split(": ")[1]);
-                                        for(let a=0; a<=4; a++) { row.find("td:nth-child("+(col_start+3)+")").remove(); }
-
-                                        var nextRow = row.next();
-                                        for(let x=1; x<question_labels.length; x++) {
-                                            col_start = 10;
-                                            nextRow.find('td[colspan="6"]').each(function(col_idx, col_el) {
-                                                if ($(col_el).index() == 3) { col_start = 5; }
-                                                return false;
-                                            });
-
-                                            nextRow.find("td:nth-child("+(col_start+1)+")")
-                                            .attr('class', 'text-center').html(label_list[x].split(": ")[0]);
-                                            nextRow.find("td:nth-child("+(col_start+2)+")")
-                                            .attr('class', 'text-start ps-1').attr('colspan', '6').html(label_list[x].split(": ")[1]);
-                                            for(let b=0; b<=4; b++) { nextRow.find("td:nth-child("+(col_start+3)+")").remove(); }
-                                            nextRow = nextRow.next();
-                                        }
-                                        return false;
-                                    }
-                                }
-                            });
+                        html_contents += `<div class="multilabel">` +
+                        `<div><span class="circle">${question_number}</span><span class="circle">.</span><span class="text">${label_list[0]}</span></div>`;
+                        for (let i=1; i<question_labels.length; i++) {
+                            html_contents += `<div><span class="circle">.</span><span class="circle">.</span><span class="text">${label_list[i]}</span></div>`;
                         }
+                        html_contents += `</div>`;
                     } else {
                         question_labels = parseInt($(this).find('td:nth-child(3)').text().split(": ")[1]);
-                        remaining_cols = 15 - question_labels;
-                        if (start_new_answers_row) {
-                            table_contents += `<tr><td class="border-0"></td><td><b>${question_number}</b></td>`;
-                            for (let z=0; z<question_labels+remaining_cols; z++) { table_contents += `<td></td>`; }
-                            table_contents += `</tr>`;
-                        } else {
-                            $("#answers_paper_table tbody tr").each(function (id, elmt) {
-                                if (($(elmt).attr('class') !== 'header_tr') && (id > 1)) {
-                                    var row = $(this);
-                                    var blank_row = true;
-                                    var col_start = 10;
-
-                                    row.find('td[colspan="6"]').each(function(col_idx, col_el) {
-                                        if ($(col_el).index() == 3) { col_start = 5; }
-                                        return false;
-                                    });
-
-                                    row.find("td:nth-child(n+"+col_start+"):nth-child(-n+17)").each(function (index, col) {
-                                        if ($(col).text() !== "") { blank_row = false; }
-                                    });
-
-                                    if (blank_row) {
-                                        row.find("td:nth-child("+col_start+")").attr('class', 'text-center').html(`<b>${question_number}</b>`);
-                                        return false;
-                                    }
-                                }
-                            });
-                        }
+                        html_contents += `<div class="verbose"><span>${question_number}</span>`;
+                        for (let i=0; i<question_labels; i++) { html_contents += `<span>.</span>`; }
+                        html_contents += `</div>`;
                     }
-                    $("#answers_paper_table tbody").append(table_contents);
-                    table_contents = ``;
-                    start_new_answers_row = (rows_left - $("#answers_paper_table tbody tr").length > 0) ? true : false;
+                    $('#answers_div').append(html_contents);
                 }
             });
-
-
-            // for (let i=0; i<=19; i++) {
-            //     table_contents += `<tr><td class="border-0"></td>`;
-            //     for (let j=0; j<=15; j++) {
-            //         if (j == 0) {
-            //             table_contents += `<td class="text-center"><b>${i+1}</b></td>`;
-            //         } else {
-            //             table_contents += `<td></td>`;
-            //         }
-            //     }
-            //     table_contents += `</tr>`;
-            // }
-
-            table_contents += `<tr id="last_tr">`;
-            for (let j=0; j<=17; j++) {
-                if (j == 0) {
-                    table_contents += `<td class="text-center border-0"><div></div></td>`;
-                } else if (j == 17) {
-                    table_contents += `<td class="text-center border-0"><div></div></td>`;
-                } else {
-                    table_contents += `<td class="border-0"></td>`;
-                }
-            }
-            table_contents += `<tr>`;
-
-            $("#answers_paper_table tbody").append(table_contents);
-            table_contents = ``;
             row_number_added = true;
-            // alert($("#answers_paper_table tbody tr").length);
         }
     }
     setInterval(add_row_number, 2000);
@@ -386,14 +124,11 @@ $(function () {
 
     $('#headerboxes_form table .form-check-input').change(function() {
         var $row = $(this).closest('tr');
-        var $select = $row.find('select');
         var $input = $row.find('input[type="text"]');
 
         if ($(this).prop('checked')) {
-            $select.prop('disabled', false);
             $input.prop('disabled', false);
         } else {
-            $select.prop('disabled', true);
             $input.prop('disabled', true);
         }
     });
@@ -406,13 +141,11 @@ $(function () {
             var header_txt = $(this).find('td:first').text();
             var checkbox_val = $(this).find("input[type='checkbox']").is(':checked');
             var label_txt = $.trim($(this).find('input[type="text"]').val());
-            var label_size = $(this).find('select').val();
 
             var row = {
                 'header': header_txt,
                 'enabled': checkbox_val,
-                'label': label_txt,
-                'size': label_size
+                'label': label_txt
             }
             data.push(row);
         });
@@ -452,78 +185,6 @@ $(function () {
         });
     });
 
-    $('#id_check').change(function() {
-        if ($(this).prop('checked')) {
-            $('#id_select').prop('disabled', false);
-            $('#id_label').prop('disabled', false);
-        } else {
-            $('#id_select').prop('disabled', true);
-            $('#id_label').prop('disabled', true);
-        }
-    });
-
-    $('#keys_check').change(function() {
-        if ($(this).prop('checked')) {
-            $('#keys_letters').prop('disabled', false);
-            $('#keys_label').prop('disabled', false);
-        } else {
-            $('#keys_letters').prop('disabled', true);
-            $('#keys_label').prop('disabled', true);
-        }
-    });
-
-    $("#keys_and_students").submit(function (e) {
-        e.preventDefault();
-
-        var data = [
-            {
-                'id_status': $('#id_check').is(':checked'),
-                'id_digits': parseInt($('#id_select').val()),
-                'id_labels': $.trim($('#id_label').val()),
-            },
-            {
-                'key_status': $('#keys_check').is(':checked'),
-                'key_letters': $.trim($('#keys_letters').val()),
-                'key_labels': $.trim($('#keys_label').val()),
-            }
-        ]
-
-        var formdata = new FormData();
-        formdata.append('data', JSON.stringify(data));
-        formdata.append('step', 4);
-        formdata.append('sheet', $('#sheet_input_id').val());
-        
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: formdata,
-            dataType: 'json',
-            contentType: false,
-            processData: false,
-            headers: {
-                'X-CSRFToken': CSRF_TOKEN
-            },
-            beforeSend: function() {
-                $("#back_btn_2").hide();
-                $("#forward_btn_3").html("Saving <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
-            },
-            success: function(response) {
-                if (response.success) {
-                    window.location.href = response.url;
-                } else {
-                    $("#back_btn_2").show();
-                    $("#forward_btn_3").html(`Next <i class="fas fa-long-arrow-right"></i>`).attr('type', 'submit');
-                    
-                    var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-                    $("#keys_and_students .formsms").html(fdback);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log(error);
-            }
-        });
-    });
-
     $("#multi_choice_form").submit(function (e) {
         e.preventDefault();
 
@@ -536,7 +197,7 @@ $(function () {
         formdata.append('questions', JSON.stringify(questions));
         formdata.append('qns_type', $('#qn_type_multichoice').val());
         formdata.append('qn_number', $('#multi_questions').val());
-        formdata.append('step', 5);
+        formdata.append('step', 4);
         formdata.append('sheet', $('#custom_sheet_id').val());
         
         $.ajax({
@@ -601,7 +262,7 @@ $(function () {
                 formdata.append('qns_type', $('#qn_type_verboselabel').val());
                 formdata.append('qn_number', $('#v_label_num_questions').val());
                 formdata.append('show_labels', $('#v_show_labels').val());
-                formdata.append('step', 5);
+                formdata.append('step', 4);
                 formdata.append('sheet', $('#custom_sheet_id').val());
                 
                 $.ajax({
@@ -659,7 +320,7 @@ $(function () {
         formdata.append('questions', JSON.stringify({'chars': parseInt($('#verb_num_chars').val())}));
         formdata.append('qns_type', $('#qn_type_verboseqns').val());
         formdata.append('qn_number', $('#verb_num_questions').val());
-        formdata.append('step', 5);
+        formdata.append('step', 4);
         formdata.append('sheet', $('#custom_sheet_id').val());
         
         $.ajax({
@@ -732,7 +393,7 @@ $(function () {
                 
                 var formdata = new FormData();
                 formdata.append('questions', JSON.stringify(questions_to_remove));
-                formdata.append('step', 7);
+                formdata.append('step', 6);
                 
                 $.ajax({
                     type: 'POST',
@@ -779,7 +440,7 @@ $(function () {
         e.preventDefault();
 
         var formdata = new FormData();
-        formdata.append('step', 6);
+        formdata.append('step', 5);
         formdata.append('sheet', $('#custom_sheet_id').val());
         
         $.ajax({

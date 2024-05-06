@@ -13,11 +13,11 @@
 #container {
     background-color: #FFFFFF;
 }
-#contents div.answerstable {
-    display: block;
-    width: 100%;
-    /* height: 1400px; */
-    height: auto;
-    float: left;
-    overflow: hidden;
+#contents div.answer_sheet {
+    display: inline-block;
+    /* width: 650px; */
+    margin: 0 auto;
+    margin-top: 0;
+    margin-right: 0;
+    float: none;
 }

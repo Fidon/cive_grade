@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db.models import Q, Sum
 from utils.util_functions import EA_TIMEZONE
 from datetime import datetime
-from .models import CustomSheet, HeaderBoxes, StudentKeys, Questions
+from .models import CustomSheet, HeaderBoxes, Questions
 import os
 import json
 import pytz
@@ -22,8 +22,7 @@ format_datetime = "%Y-%m-%d %H:%M:%S.%f"
 def answer_sheets_page(request, step=None, sheet=None):
     if step is not None and step > 0:
         step = 1 if sheet is None or not CustomSheet.objects.filter(id=sheet, teacher=request.user, published=False).exists() else step
-        step1_names, sizes, header_boxes, id_section, keys_section = "", None, None, None, None
-        questions_list = []
+        step1_names, header_boxes, questions_list = "", None, []
         
         if step == 1 and CustomSheet.objects.filter(teacher=request.user, published=False).exists():
             c_sheet = CustomSheet.objects.filter(teacher=request.user, published=False).order_by('-id').first()
@@ -32,11 +31,6 @@ def answer_sheets_page(request, step=None, sheet=None):
         if sheet is not None and HeaderBoxes.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
             hd_boxes = HeaderBoxes.objects.get(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False)
             header_boxes = hd_boxes.contents
-            sizes = [{'short': 's', 'long': 'Small'}, {'short': 'm', 'long': 'Medium'}, {'short': 'l', 'long': 'Large'}]
-        if sheet is not None and StudentKeys.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
-            studentkeys = StudentKeys.objects.get(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False)
-            id_section = studentkeys.contents[0]
-            keys_section = studentkeys.contents[1]
         if sheet is not None and Questions.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).exists():
             sheet_questions = Questions.objects.filter(sheet_id=sheet, sheet__teacher=request.user, sheet__published=False).order_by('id')
             for qns in sheet_questions:
@@ -55,14 +49,10 @@ def answer_sheets_page(request, step=None, sheet=None):
             'sheet_name': CustomSheet.objects.get(id=sheet) if sheet is not None and step > 0 else "",
             'questions': range(1, 51),
             'v_labels': range(1, 11),
-            'answer_len': range(3, 8),
+            'answer_len': range(3, 11),
             'names': step1_names,
             'header_boxes': header_boxes,
-            'sizes': sizes,
-            'id_section': id_section,
-            'keys_section': keys_section,
             'questions_list': questions_list,
-            'table_columns': range(1, 34),
         }
         return render(request, 'answer_sheets/select_sheets.html', context=context)
     return render(request, 'answer_sheets/select_sheets.html')
@@ -126,25 +116,6 @@ def save_custom_sheets(request):
                 fdback = {'success': False, 'sms': 'Unknown error..!'}
         elif next_step == 4:
             sheet = int(request.POST.get('sheet'))
-            next_url = reverse('create_custom_sheet', kwargs={'step': next_step, 'sheet': sheet})
-            try:
-                data = request.POST.get('data')
-                data = json.loads(data)
-
-                if StudentKeys.objects.filter(sheet_id=sheet, sheet__published=False, sheet__teacher=request.user).exists():
-                    st_keys = StudentKeys.objects.get(sheet_id=sheet, sheet__published=False, sheet__teacher=request.user)
-                    st_keys.contents = data
-                    st_keys.save()
-                else:
-                    StudentKeys.objects.create(
-                        contents=data,
-                        sheet=CustomSheet.objects.get(id=sheet)
-                    )
-                fdback = {'success': True, 'url': next_url}
-            except Exception as e:
-                fdback = {'success': False, 'sms': 'Unknown error..!'}
-        elif next_step == 5:
-            sheet = int(request.POST.get('sheet'))
             try:
                 data = request.POST.get('questions')
                 data = json.loads(data)
@@ -162,7 +133,7 @@ def save_custom_sheets(request):
                 fdback = {'success': True}
             except Exception as e:
                 fdback = {'success': False, 'sms': 'Unknown error..!'}
-        elif next_step == 6:
+        elif next_step == 5:
             try:
                 next_url = reverse('custom_list')
                 sheet_id = int(request.POST.get('sheet'))
@@ -172,7 +143,7 @@ def save_custom_sheets(request):
                 fdback = {'success': True, 'url': next_url}
             except Exception as e:
                 fdback = {'success': False, 'sms': 'Unknown error..!'}
-        elif next_step == 7:
+        elif next_step == 6:
             try:
                 questions = request.POST.get('questions')
                 questions = json.loads(questions)
@@ -333,7 +304,6 @@ def custom_sheets_list(request):
         try:
             sheet = request.POST.get('delete_sheet')
             Questions.objects.filter(sheet_id=sheet).delete()
-            StudentKeys.objects.filter(sheet_id=sheet).delete()
             HeaderBoxes.objects.filter(sheet_id=sheet).delete()
             CustomSheet.objects.get(id=sheet).delete()
             fdback = {'success': True}

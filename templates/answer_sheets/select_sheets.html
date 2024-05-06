@@ -11,7 +11,7 @@
   {% if custom_form %}
     {% if step == 1 %}
       <form class="form_step1 d-inline-block mx-2 my-5 p-2" action="{% url 'save_sheet' %}" autocomplete="off" id="step_one_form">
-        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 1 of 5: Custom Answer Sheet Name</div>
+        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 1 of 3: Answer sheet names</div>
         <div class="formsms w-100 float-start text-start my-1"></div>
         <div class="form-floating d-block w-100 float-start my-1">
           <input type="text" minlength="3" maxlength="64" class="form-control text-ttxt1" name="names" id="custom_name" value="{{ names }}" placeholder="p" required autofocus />
@@ -25,7 +25,7 @@
       </form>
     {% elif step == 2 %}
       <form class="form_step2 d-inline-block mx-2 my-5 p-2" id="headerboxes_form" action="{% url 'save_sheet' %}" autocomplete="off">
-        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 2 of 5: Header boxes</div>
+        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 2 of 3: Header fields</div>
         <div class="formsms w-100 float-start text-start my-1"></div>
         <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 py-1">
           <b>Answer sheet name:</b> {{ sheet_name }}
@@ -36,7 +36,6 @@
               <th>Usage</th>
               <th>Enabled</th>
               <th>Displayed label</th>
-              <th>Width</th>
             </tr>
           </thead>
           <tbody>
@@ -55,37 +54,25 @@
                   </td>
                   <td>
                     {% if hd.enabled %}
-                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" required />
+                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" readonly />
                     {% else %}
-                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" required disabled />
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if hd.enabled %}
-                      <select class="form-select d-inline-block w-auto text-ttxt1" required>
-                        {% for s in sizes %}
-                          {% if s.short == hd.size %}
-                            <option value="{{ s.short }}" selected>{{ s.long }}</option>
-                          {% else %}
-                            <option value="{{ s.short }}">{{ s.long }}</option>
-                          {% endif %}
-                        {% endfor %}
-                      </select>
-                    {% else %}
-                      <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
-                        {% for s in sizes %}
-                          {% if s.short == hd.size %}
-                            <option value="{{ s.short }}" selected>{{ s.long }}</option>
-                          {% else %}
-                            <option value="{{ s.short }}">{{ s.long }}</option>
-                          {% endif %}
-                        {% endfor %}
-                      </select>
+                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" readonly disabled />
                     {% endif %}
                   </td>
                 </tr>
               {% endfor %}
             {% else %}
+              <tr>
+                <td>Reg#</td>
+                <td class="text-center">
+                  <div class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" checked />
+                  </div>
+                </td>
+                <td>
+                  <input type="text" class="form-control text-ttxt1" value="Student ID" placeholder="Enter label" readonly />
+                </td>
+              </tr>
               <tr>
                 <td>Name</td>
                 <td class="text-center">
@@ -94,14 +81,7 @@
                   </div>
                 </td>
                 <td>
-                  <input type="text" class="form-control text-ttxt1" value="Name" placeholder="Enter label" required />
-                </td>
-                <td>
-                  <select class="form-select d-inline-block w-auto text-ttxt1" required>
-                    <option value="s">Small</option>
-                    <option value="m" selected>Medium</option>
-                    <option value="l">Large</option>
-                  </select>
+                  <input type="text" class="form-control text-ttxt1" value="Name" placeholder="Enter label" readonly />
                 </td>
               </tr>
               <tr>
@@ -112,14 +92,7 @@
                   </div>
                 </td>
                 <td>
-                  <input type="text" class="form-control text-ttxt1" value="Exam" placeholder="Enter label" required />
-                </td>
-                <td>
-                  <select class="form-select d-inline-block w-auto text-ttxt1" required>
-                    <option value="s">Small</option>
-                    <option value="m" selected>Medium</option>
-                    <option value="l">Large</option>
-                  </select>
+                  <input type="text" class="form-control text-ttxt1" value="Exam" placeholder="Enter label" readonly />
                 </td>
               </tr>
               <tr>
@@ -130,68 +103,7 @@
                   </div>
                 </td>
                 <td>
-                  <input type="text" class="form-control text-ttxt1" value="Class" placeholder="Enter label" required />
-                </td>
-                <td>
-                  <select class="form-select d-inline-block w-auto text-ttxt1" required>
-                    <option value="s">Small</option>
-                    <option value="m">Medium</option>
-                    <option value="l">Large</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>Item1</td>
-                <td class="text-center">
-                  <div class="form-check form-switch form-check-inline">
-                    <input class="form-check-input" type="checkbox" />
-                  </div>
-                </td>
-                <td>
-                  <input type="text" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
-                </td>
-                <td>
-                  <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
-                    <option value="s">Small</option>
-                    <option value="m">Medium</option>
-                    <option value="l">Large</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>Item2</td>
-                <td class="text-center">
-                  <div class="form-check form-switch form-check-inline">
-                    <input class="form-check-input" type="checkbox" />
-                  </div>
-                </td>
-                <td>
-                  <input type="text" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
-                </td>
-                <td>
-                  <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
-                    <option value="s">Small</option>
-                    <option value="m">Medium</option>
-                    <option value="l">Large</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>Item3</td>
-                <td class="text-center">
-                  <div class="form-check form-switch form-check-inline">
-                    <input class="form-check-input" type="checkbox" />
-                  </div>
-                </td>
-                <td>
-                  <input type="text" class="form-control text-ttxt1" placeholder="Enter label" required disabled />
-                </td>
-                <td>
-                  <select class="form-select d-inline-block w-auto text-ttxt1" required disabled>
-                    <option value="s">Small</option>
-                    <option value="m">Medium</option>
-                    <option value="l">Large</option>
-                  </select>
+                  <input type="text" class="form-control text-ttxt1" value="Class" placeholder="Enter label" readonly />
                 </td>
               </tr>
             {% endif %}
@@ -204,138 +116,9 @@
         </div>
       </form>
     {% elif step == 3 %}
-      <form class="form_step3 d-inline-block mx-2 my-5 p-2 text-ttxt1 shadow-sm rounded" id="keys_and_students" action="{% url 'save_sheet' %}" autocomplete="off">
-        <div class="d-block w-100 float-start text-start fs-6 border-bottom border-ttxt1 py-1 mb-1">Step 3 of 5: Key Version and Student ID</div>
-        <div class="formsms w-100 float-start text-start my-1"></div>
-        <div class="d-block w-100 float-start text-start fs-6 py-1 mb-3">
-          <b>Answer sheet name:</b> {{ sheet_name }}
-        </div>
-        {% if id_section %}
-          <div class="d-block w-100 float-start">
-            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
-              Include ID section:<div class="form-check form-switch form-check-inline">
-                <div class="form-check form-switch">
-                  {% if id_section.id_status %}
-                    <input class="form-check-input" type="checkbox" id="id_check" checked />
-                  {% else %}
-                    <input class="form-check-input" type="checkbox" id="id_check" />
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            {% if id_section.id_status %}
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-                Number of student ID digits: &nbsp;<select class="form-select d-inline-block w-auto" id="id_select">
-                  {% for num in v_labels %}
-                    {% if id_section.id_digits == num %}
-                      <option value="{{ num }}" selected>{{ num }}</option>
-                    {% else %}
-                      <option value="{{ num }}">{{ num }}</option>
-                    {% endif %}
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-                Label for Student ID Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" id="id_label" value="{{ id_section.id_labels }}" required />
-              </div>
-            {% else %}
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-                Number of student ID digits: &nbsp;<select class="form-select d-inline-block w-auto" id="id_select" disabled>
-                  {% for num in v_labels %}
-                    {% if id_section.id_digits == num %}
-                      <option value="{{ num }}" selected>{{ num }}</option>
-                    {% else %}
-                      <option value="{{ num }}">{{ num }}</option>
-                    {% endif %}
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-                Label for Student ID Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" id="id_label" value="{{ id_section.id_labels }}" required disabled />
-              </div>
-            {% endif %}
-          </div>
-        {% else %}
-          <div class="d-block w-100 float-start">
-            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
-              Include ID section:<div class="form-check form-switch form-check-inline">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" id="id_check" checked />
-                </div>
-              </div>
-            </div>
-            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-              Number of student ID digits: &nbsp;<select class="form-select d-inline-block w-auto" id="id_select">
-                {% for num in v_labels %}
-                  {% if num == 5 %}
-                    <option value="{{ num }}" selected>{{ num }}</option>
-                  {% else %}
-                    <option value="{{ num }}">{{ num }}</option>
-                  {% endif %}
-                {% endfor %}
-              </select>
-            </div>
-            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-              Label for Student ID Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" id="id_label" value="Student ID" required />
-            </div>
-          </div>
-        {% endif %}
-        {% if keys_section %}
-          <div class="d-block w-100 float-start mt-5">
-            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
-              Include Key Version Section:<div class="form-check form-switch form-check-inline">
-                <div class="form-check form-switch">
-                  {% if keys_section.key_status %}
-                    <input class="form-check-input" type="checkbox" id="keys_check" checked />
-                  {% else %}
-                    <input class="form-check-input" type="checkbox" id="keys_check" />
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            {% if keys_section.key_status %}
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-                Letters for key versions: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="2" value="{{ keys_section.key_letters }}" id="keys_letters" required />
-              </div>
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-                Label for Key Version Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" value="{{ keys_section.key_labels }}" id="keys_label" required />
-              </div>
-            {% else %}
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-                Letters for key versions: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="2" value="{{ keys_section.key_letters }}" id="keys_letters" required disabled />
-              </div>
-              <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-                Label for Key Version Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" value="{{ keys_section.key_labels }}" id="keys_label" required disabled />
-              </div>
-            {% endif %}
-          </div>
-        {% else %}
-          <div class="d-block w-100 float-start mt-5">
-            <div class="d-block w-100 float-start text-start position-relative fs-6 p-1">
-              Include Key Version Section:<div class="form-check form-switch form-check-inline">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" id="keys_check" checked />
-                </div>
-              </div>
-            </div>
-            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pt-4">
-              Letters for key versions: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="2" value="ABCDE" id="keys_letters" required />
-            </div>
-            <div class="dark d-block w-100 float-start text-start fs-6 p-2 pb-4">
-              Label for Key Version Section: &nbsp;<input type="text" class="form-control d-inline-block w-auto" minlength="3" value="Keys" id="keys_label" required />
-            </div>
-          </div>
-        {% endif %}
-        <input type="hidden" value="{{ sheet }}" id="sheet_input_id" />
-        <div class="form-floating d-block w-100 float-start my-3">
-          <a href="{% url 'create_custom_sheet' 2 sheet %}" id="back_btn_2" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
-          <button type="submit" id="forward_btn_3" class="btn btn-bblight text-white d-inline-block float-end">Next <i class="fas fa-long-arrow-right"></i></button>
-        </div>
-      </form>
-    {% elif step == 4 %}
       <input type="hidden" value="{{ sheet }}" id="custom_sheet_id" />
       <form class="form_step4 mx-1 my-5 p-2 text-ttxt1" action="{% url 'save_sheet' %}" id="publish_sheet_form">
-        <div class="d-block w-100 float-start text-start fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 4 of 5: Define Questions</div>
+        <div class="d-block w-100 float-start text-start fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 3 of 3: Define Questions</div>
         <div class="d-block w-100 float-start text-start fs-6 py-1">
           <b>Answer sheet name:</b> {{ sheet_name }}
         </div>
@@ -356,11 +139,7 @@
                   {% if qns.type == 'multichoice' %}
                     <tr class="tr_{{ qns.id }}">
                       <td class="{{ qns.type }}"></td>
-                      {% if qns.qns.qn_type == 1 %}
-                        <td class="text-start">Internal labels</td>
-                      {% else %}
-                        <td class="text-start">External labels</td>
-                      {% endif %}
+                      <td class="text-start">Multi-choices</td>
                       <td class="text-start">{{ qns.qns.qn_labels }}</td>
                       <td>
                         <div class="form-check d-inline-block">
@@ -423,14 +202,53 @@
         </div>
       </form>
 
-      {% comment %}answer-sheet table for preview{% endcomment %}
-      <div class="answerstable table-responsive">
+      {% comment %}answer-sheet for preview{% endcomment %}
+      <div class="answer_sheet">
         <input type="hidden" id="header_boxes_input" value="{{ header_boxes }}" />
         <input type="hidden" id="id_section_input" value="{{ id_section }}" />
         <input type="hidden" id="keys_section_input" value="{{ keys_section }}" />
-        <table id="answers_paper_table">
-          <tbody></tbody>
-        </table>
+        <div class="d-block w-100" id="sheet_view">
+          <div class="w-100 d-block float-start mt-3" id="answers_div">
+            {% comment %} <div class="multichoice">
+              <span>1</span>
+              <span>A</span>
+              <span>B</span>
+              <span>C</span>
+              <span>D</span>
+              <span>E</span>
+            </div>
+            <div class="multilabel">
+              <div>
+                <span class="circle">2</span>
+                <span class="circle">.</span>
+                <span class="text">A: Computer</span>
+              </div>
+              <div>
+                <span class="circle">.</span>
+                <span class="circle">.</span>
+                <span class="text">B: Laptop</span>
+              </div>
+              <div>
+                <span class="circle">.</span>
+                <span class="circle">.</span>
+                <span class="text">C: Desktop</span>
+              </div>
+            </div>
+            <div class="verbose">
+              <span>3</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+            </div> {% endcomment %}
+          </div>
+        </div>
       </div>
 
       {% comment %}modal to add multi-choice question{% endcomment %}

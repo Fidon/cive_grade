@@ -32,18 +32,6 @@ class HeaderBoxes(models.Model):
         return str(self.contents)
     
 
-# StudentKeys model
-class StudentKeys(models.Model):
-    id = models.AutoField(primary_key=True)
-    regdate = models.DateTimeField(default=dtime)
-    contents = models.JSONField(null=True, default=None)
-    sheet = models.ForeignKey(CustomSheet, on_delete=models.PROTECT, related_name='sheet_keys')
-    objects = models.Manager()
-    
-    def __str__(self):
-        return str(self.contents)
-    
-
 # Questions model
 class Questions(models.Model):
     id = models.AutoField(primary_key=True)
