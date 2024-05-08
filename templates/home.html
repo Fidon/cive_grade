@@ -21,7 +21,7 @@
       </tr>
     {% endfor %}
   </table>
-  <form id="upload_formm" action="{% url 'upload_majibu' %}" enctype="multipart/form-data" method="post" autocomplete="off" class="d-inline-block w-50 p-5">
+  <form id="upload_formm" action="{% url 'upload_majibu' %}" enctype="multipart/form-data" method="post" autocomplete="off" class="d-none w-50 p-5">
     {% csrf_token %}
     <div class="formsms text-start mb-1"></div>
     <div class="form-floating mt-2">
