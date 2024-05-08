@@ -4,8 +4,40 @@ $(function () {
     var remove_questions = true;
     var row_number_added = false;
 
-    function isNumber(value) {
-        return /^\d+$/.test(value);
+    function sort_questions() {
+        var parent = $('#answers_div');
+        var lastChild = parent.children(':last-child');
+
+        var parentWidth = parent.width();
+        var parentHeight = parent.height();
+        var lastChildWidth = lastChild.width();
+        var lastChildHeight = lastChild.height();
+
+        var overlap = false;
+        var randomLeft, randomTop;
+
+        do {
+            randomLeft = Math.floor(Math.random() * (parentWidth - lastChildWidth));
+            randomTop = Math.floor(Math.random() * (parentHeight - lastChildHeight));
+
+            // Check for collision with existing child divs
+            overlap = false;
+            parent.children('.child').each(function() {
+                var thisLeft = $(this).position().left;
+                var thisTop = $(this).position().top;
+                var thisWidth = $(this).width();
+                var thisHeight = $(this).height();
+
+                if (!(randomLeft + lastChildWidth < thisLeft || randomLeft > thisLeft + thisWidth || 
+                    randomTop + lastChildHeight < thisTop || randomTop > thisTop + thisHeight)) {
+                    overlap = true;
+                    return false; // Exit the loop if overlap is found
+                }
+            });
+        } while (overlap);
+
+        // Position the last child div
+        lastChild.css({left: randomLeft, top: randomTop});
     }
 
     // parse string into js object/array
@@ -31,21 +63,21 @@ $(function () {
                 html_contents += `<div class="sheeet_head">` +
                 `<div class="title">Student ID:</div>` +
                 `<div class="id_boxes">`;
-                for (let i=0; i<13; i++) { html_contents += `<span></span>`; }
+                for (let i=0; i<18; i++) { html_contents += `<span></span>`; }
                 html_contents += `</div></div>`;
             }
             if (header_boxes[2].enabled) {
                 html_contents += `<div class="sheeet_head ${box_width}">` +
                 `<div class="title">Exam:</div>` +
                 `<div class="id_boxes">`;
-                for (let i=0; i<5; i++) { html_contents += `<span></span>`; }
+                for (let i=0; i<7; i++) { html_contents += `<span></span>`; }
                 html_contents += `</div></div>`;
             }
             if (header_boxes[3].enabled) {
                 html_contents += `<div class="sheeet_head ${box_width}">` +
                 `<div class="title">Class:</div>` +
                 `<div class="id_boxes">`;
-                for (let i=0; i<5; i++) { html_contents += `<span></span>`; }
+                for (let i=0; i<7; i++) { html_contents += `<span></span>`; }
                 html_contents += `</div></div>`;
             }
             if (header_boxes[1].enabled) {
@@ -70,7 +102,7 @@ $(function () {
                     } else if (question_type == "verboselabel") {
                         var label_list = [];
                         question_labels = $(this).find('td:nth-child(3) li');
-                        question_labels.each(function(index) { label_list.push($(this).text()); });
+                        question_labels.each(function(idx) { label_list.push($(this).text()); });
                         html_contents += `<div class="multilabel">` +
                         `<div><span class="circle">${question_number}</span><span class="circle">.</span><span class="text">${label_list[0]}</span></div>`;
                         for (let i=1; i<question_labels.length; i++) {
@@ -84,6 +116,7 @@ $(function () {
                         html_contents += `</div>`;
                     }
                     $('#answers_div').append(html_contents);
+                    // sort_questions();
                 }
             });
             row_number_added = true;
@@ -183,6 +216,10 @@ $(function () {
                 console.log(error);
             }
         });
+    });
+
+    $('#multi_labels').on('input', function(){
+        $(this).val($(this).val().toUpperCase());
     });
 
     $("#multi_choice_form").submit(function (e) {

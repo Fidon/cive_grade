@@ -115,10 +115,8 @@
 #contents div.answer_sheet {
     width: 650px;
     float: right;
-    height: auto;
     height: 1032px;
-    border: 1px solid #2D2D2D;
-    color: #2D2D2D;
+    border: 1px solid rgba(45, 45, 45, .2);
     padding: 10px;
     margin-top: 70px;
     margin-right: 100px;
@@ -128,99 +126,90 @@
 
 /* answer sheet headers */
 #sheet_view .sheeet_head {
-    display: block;
+    display: flex;
     width: 100%;
-    float: left;
     margin-bottom: 5px;
-    font-size: 0;
-}
-#sheet_view .sheeet_head .title,
-#sheet_view .sheeet_head .id_boxes,
-#sheet_view .sheeet_head .box {
-    display: inline-block;
     float: left;
-    width: calc(100% - 80px);
-    font-size: 0;
-}
-#sheet_view .sheeet_head .title {
-    font-size: 15px;
-    width: 80px;
-    position: relative;
-    top: 8px;
-    text-align: center;
-}
-#sheet_view .sheeet_head .id_boxes span {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 1px solid #000000;
-    border-left: none;
-}
-#sheet_view .sheeet_head .id_boxes span:first-child {
-    border-left: 1px solid #000000;
-}
-#sheet_view .sheeet_head .box {
-    height: 40px;
-    border: 1px solid #000000;
 }
 
+#sheet_view .sheeet_head .title {
+    width: 82px;
+    font-size: 15px;
+    color: #696969;
+    text-align: center;
+    margin-top: 5px;
+}
+
+#sheet_view .sheeet_head .id_boxes,
+#sheet_view .sheeet_head .box {
+    flex: 1;
+    display: flex;
+}
+
+#sheet_view .sheeet_head .id_boxes span {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #2D2D2D;
+    border-left: none;
+}
+
+#sheet_view .sheeet_head .id_boxes span:first-child {
+    border-left: 1px solid #2D2D2D;
+}
+
+#sheet_view .sheeet_head .box {
+    height: 30px;
+    border: 1px solid #2D2D2D;
+}
+
+
 /* answer sheet questions */
-#answers_div .multichoice,
-#answers_div .multilabel,
-#answers_div .verbose {
-    display: inline-block;
-    width: auto;
+#answers_div {
+    display: block;
+    width: 100%;
+    height: auto;
     float: left;
+    margin-top: 30px;
+}
+#answers_div .multichoice,
+#answers_div .verbose {
+    display: inline-flex;
+    width: auto;
     font-size: 0;
     margin: 5px;
     padding: 0;
-    /* border: 1px solid red; */
 }
-#answers_div .multichoice span,
-#answers_div .multilabel div .circle {
+#answers_div .multichoice span {
     display: inline-block;
     font-size: 15px;
-    width: 42px;
-    height: 42px;
+    width: 25px;
+    height: 25px;
     margin: 3px;
-    border: 2px solid #000000;
+    border: 1px solid #696969;
+    color: #696969;
     text-align: center;
-    line-height: 39px;
+    line-height: 23px;
     border-radius: 50%;
 }
-#answers_div .multichoice span:first-child,
-#answers_div .multilabel div .circle:first-child {
+#answers_div .multichoice span:first-child {
     border: none;
     margin: 3px 0;
 }
-#answers_div .multilabel div .text {
-    display: inline-block;
-    font-size: 15px;
-    width: auto;
-    margin: 3px;
-    padding-right: 4px;
-}
-#answers_div .multilabel div .circle {
-    color: transparent;
-}
-#answers_div .multilabel div:first-child .circle:first-child {
-    color: #2D2D2D;
-}
 #answers_div .verbose span {
     display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 1px solid #000000;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #2D2D2D;
     border-left: none;
     color: transparent;
     font-size: 15px;
     text-align: center;
-    line-height: 38px;
+    line-height: 28px;
 }
 #answers_div .verbose span:first-child {
-    color: #2D2D2D;
+    color: #696969;
     border: none;
 }
 #answers_div .verbose span:nth-child(2) {
-    border-left: 1px solid #000000;
+    border-left: 1px solid #2D2D2D;
 }

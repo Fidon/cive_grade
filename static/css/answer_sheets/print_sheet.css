@@ -15,7 +15,8 @@
 }
 #contents div.answer_sheet {
     display: inline-block;
-    /* width: 650px; */
+    /* width: 650px;
+    height: 1032px; */
     margin: 0 auto;
     margin-top: 0;
     margin-right: 0;

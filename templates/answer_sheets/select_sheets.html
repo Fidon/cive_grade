@@ -192,7 +192,7 @@
         </table>
         <div class="form-floating d-block w-100 float-start my-3 text-start">
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#multi_choice_modal">Add multiple-choice questions</button>
-          <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_label_modal">Add verbose label questions</button>
+          {% comment %} <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_label_modal">Add verbose label questions</button> {% endcomment %}
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_questions_modal">Add verbose questions</button>
           <button type="button" class="btn btn-bblue d-inline-block m-1" onclick="print()">Print</button>
         </div>
@@ -208,7 +208,7 @@
         <input type="hidden" id="id_section_input" value="{{ id_section }}" />
         <input type="hidden" id="keys_section_input" value="{{ keys_section }}" />
         <div class="d-block w-100" id="sheet_view">
-          <div class="w-100 d-block float-start mt-3" id="answers_div">
+          <div id="answers_div">
             {% comment %} <div class="multichoice">
               <span>1</span>
               <span>A</span>
@@ -261,7 +261,7 @@
             </div>
             <div class="modal-body">
               <div class="formsms w-100 float-start text-start my-1"></div>
-              <div class="form-floating d-block w-100 float-start my-1 d-none">
+              <div class="form-floating d-none w-100 float-start my-1">
                 <select class="form-select text-ttxt1" id="multi_type" required>
                   <option value="1">Internal label</option>
                   <option value="2">External label</option>
@@ -309,13 +309,13 @@
                 </select>
                 <label class="form-label text-ttxt1" for="v_label_num_questions">Select number of questions</label>
               </div>
-              <div class="form-floating d-block w-100 float-start my-1 d-none">
+              {% comment %} <div class="form-floating d-block w-100 float-start my-1">
                 <select class="form-select text-ttxt1" id="v_show_labels" required>
                   <option value="1">Show short label</option>
                   <option value="0">Hide short label</option>
                 </select>
                 <label class="form-label text-ttxt1" for="v_show_labels">Display short labels on answer sheet</label>
-              </div>
+              </div> {% endcomment %}
               <div class="form-floating d-block w-100 float-start my-1">
                 <table class="table w-100 float-start table-striped text-ttxt1 table_labels">
                   <thead class="bg-bblight text-white">

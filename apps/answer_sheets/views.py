@@ -42,19 +42,19 @@ def answer_sheets_page(request, step=None, sheet=None):
                     'show': qns.show_labels if qns.show_labels else None
                 })
     
-        context = {
+        tmp_data = {
             'custom_form': True,
             'step': step,
             'sheet': sheet,
             'sheet_name': CustomSheet.objects.get(id=sheet) if sheet is not None and step > 0 else "",
-            'questions': range(1, 51),
+            'questions': range(1, 21),
             'v_labels': range(1, 11),
-            'answer_len': range(3, 11),
+            'answer_len': range(3, 19),
             'names': step1_names,
             'header_boxes': header_boxes,
             'questions_list': questions_list,
         }
-        return render(request, 'answer_sheets/select_sheets.html', context=context)
+        return render(request, 'answer_sheets/select_sheets.html', context=tmp_data)
     return render(request, 'answer_sheets/select_sheets.html')
 
 
