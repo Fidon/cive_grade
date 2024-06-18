@@ -1,0 +1,257 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block title %}
+  Exams | UDOM EMS
+{% endblock %}
+{% block styles %}
+  <link href="{% static 'css/exams/exams.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contents %}
+  {% if exam_info %}
+    <div class="exam_info">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#exam_info_div">Information</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#exam_marking">Marking</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#exam_results">Results</a>
+        </li>
+      </ul>
+      <div class="tab_container">
+        <div id="exam_info_div" class="tab_div">
+          <h5>Exam information..</h5><hr class="my-1" />
+          <div class="info">
+            <div>
+              <b>Created on:</b> &nbsp; {{ exam.dates }}
+            </div>
+            <div>
+              <b>Last edited on:</b> &nbsp; {{ exam.lastupdate }}
+            </div>
+            <div>
+              <b>Exam name:</b> &nbsp; {{ exam.name }}
+              <input type="hidden" value="{{ exam.name }}" id="get_exam_names" />
+            </div>
+            <div>
+              <b>Answer sheet:</b> &nbsp; <a href="{{ exam.sheet_url }}" class="btn btn-sm btn-bblight text-white">{{ exam.answer_sheet }}</a>
+            </div>
+            <div class="d-block w-100">
+              <b>Exam description:</b> &nbsp; {{ exam.describe|linebreaks }}
+            </div>
+            <div class="d-block w-100 py-3">
+              <button type="button" class="btn btn-bblue text-white d-inline-block m-2" data-bs-toggle="offcanvas" data-bs-target="#update_exams_canvas">Update</button>
+              <button type="button" class="btn btn-danger d-inline-block m-2" data-bs-toggle="modal" data-bs-target="#confirm_delete_modal">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div id="exam_marking" class="tab_div">
+          <h5>Mark exam..</h5><hr class="my-1" />
+          <form id="mark_exam_form" enctype="multipart/form-data" action="{% url 'mark_exam' %}" autocomplete="off">
+            <div class="formsms w-100 float-start my-1 text-start"></div>
+            <div class="form-floating d-block w-100 float-start my-1">
+              <input type="file" class="form-control text-ttxt fs-6" id="exam_attachment" name="exam_attachment" placeholder="p" accept="image/*" capture="environment" required />
+              <label for="exam_attachment" class="form-label text-ttxt fs-6">Exam answer sheet image</label>
+            </div>
+            <input type="hidden" value="{{ exam.sheet }}" name="sheet" />
+            <input type="hidden" value="{{ exam.id }}" name="exam" />
+            <input type="hidden" value="{{ exam.circles_count }}" name="circles" />
+            <input type="hidden" value="{{ exam.squares_count }}" name="squares" />
+            <div class="form-floating d-block w-100 float-start my-3 text-end">
+              <button type="submit" class="btn btn-success d-inline-block" id="mark_exam_btn">Mark exam</button>
+            </div>
+          </form>
+        </div>
+        <div id="exam_results" class="tab_div">
+          <div class="searchdiv input-group w-100 float-start">
+            <input type="text" class="form-control text-ttxt fs-6" id="results_search" placeholder="Search.." autocomplete="off" />
+            <button type="button" class="btn btn-bblue text-white ms-1" id="results_filter_clear" title="Clear filters"><i class="fas fa-refresh"></i></button>
+          </div>
+
+          <div class="d-block w-100 float-start my-2 table-responsive">
+            <table class="table text-ttxt text-center align-middle table-striped w-100" id="results_table">
+              <thead>
+                <tr class="bg-bblight text-white">
+                  <th>S/n</th>
+                  <th>ResultDate</th>
+                  <th>RegNumber</th>
+                  <th>Names</th>
+                  <th>Program</th>
+                  <th>Marks</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+
+          <input type="hidden" value="{% url 'exam_results' exam.id %}" id="results_list_url" />
+        </div>
+      </div>
+    </div>
+
+    <div class="offcanvas offcanvas-start" id="update_exams_canvas">
+      <div class="offcanvas-header bg-bblue">
+        <h6 class="offcanvas-title text-white">Update exam info..</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body bg-llight">
+        <form class="d-block w-100 float-start" id="new_exam_form" action="{% url 'exam_actions' %}" autocomplete="off">
+          <div class="formsms w-100 float-start my-1 text-start"></div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt fs-6" id="exam_names" name="exam_name" placeholder="p" required value="{{ exam.name }}" />
+            <label for="exam_names" class="text-ttxt fs-6">Exam name</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <select class="form-select text-ttxt" id="answer_sheet" name="sheet" required>
+              <option value="">--select--</option>
+              {% for sheet in answer_sheets %}
+                {% if exam.sheet == sheet.id %}
+                  <option value="{{ sheet.id }}" selected>{{ sheet.name }}</option>
+                {% else %}
+                  <option value="{{ sheet.id }}">{{ sheet.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            <label class="form-label text-ttxt" for="answer_sheet">Select answer sheet</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <textarea class="form-control text-ttxt fs-6" id="exam_describe" placeholder="d" style="min-height:150px;" name="description">{{ exam.info }}</textarea>
+            <label for="exam_describe" class="text-ttxt fs-6">Exam description/comment (if any)</label>
+          </div>
+          <input type="hidden" value="{{ exam.id }}" name="edit_exam" />
+          <div class="form-floating d-block w-100 float-start my-3 text-end">
+            <button type="button" class="btn btn-danger d-inline-block me-2" id="exam_cancel_btn" data-bs-dismiss="offcanvas">Cancel</button>
+            <button type="submit" class="btn btn-success d-inline-block" id="exam_submit_btn">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" id="confirm_delete_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-bblue">
+            <h6 class="modal-title text-white">Delete exam..</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="formsms d-block float-start w-100 text-start"></div>
+            <div class="form-floating d-block w-100 float-start text-ttxt fs-6 py-3 my-1">Are you sure you want to delete this exam..?</div>
+            <input type="hidden" value="{{ exam.id }}" name="delete_exam" id="get_examination_id" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="cancel_delete_btn"><i class="fas fa-times-circle"></i> No</button>
+            <button type="button" class="btn btn-danger" id="confirm_delete_btn"><i class="fas fa-check-circle"></i> Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="mark_results_model">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-bblue">
+            <h6 class="modal-title text-white">Marking results..</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="formsms d-block float-start w-100 text-start"></div>
+            <div class="form-floating d-block w-100 float-start text-ttxt text-start fs-6 p-3 my-1">
+              Student ID: <span id="ex_regno"></span><br />
+              Marks: <span id="ex_marks"></span><br />
+              Correct answers: <span id="ex_correct"></span><br />
+              Incorrect answers: <span id="ex_wrong"></span><br />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-bblue" data-bs-dismiss="modal"><i class="fas fa-check-circle"></i> Okay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="searchdiv input-group w-100 float-start">
+      <input type="text" class="form-control text-ttxt fs-6" id="exams_search" placeholder="Search.." autocomplete="off" />
+      <button type="button" class="btn btn-bblue text-white ms-1" id="exams_filter_clear" title="Clear filters"><i class="fas fa-refresh"></i></button>
+      <button type="button" class="btn btn-success ms-1" id="add_new_exam" title="Add new exam" data-bs-toggle="offcanvas" data-bs-target="#new_exams_canvas"><i class="fas fa-plus-circle"></i></button>
+    </div>
+
+    <div class="d-block w-100 float-start my-2 table-responsive">
+      <table class="table text-ttxt text-center align-middle table-striped" id="exams_list_table">
+        <thead>
+          <tr class="bg-bblight text-white">
+            <th>S/n</th>
+            <th>Created</th>
+            <th>ExamName</th>
+            <th>AnswerSheet</th>
+            <th>Questions</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <input type="hidden" value="{% url 'exams_list' %}" id="exams_list_url" />
+
+    <div class="offcanvas offcanvas-start" id="new_exams_canvas">
+      <div class="offcanvas-header bg-bblue">
+        <h6 class="offcanvas-title text-white">Create new exam..</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body bg-llight">
+        <form class="d-block w-100 float-start" id="new_exam_form" action="{% url 'exam_actions' %}" autocomplete="off">
+          <div class="formsms w-100 float-start my-1 text-start"></div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt fs-6" id="exam_names" name="exam_name" placeholder="p" required />
+            <label for="exam_names" class="text-ttxt fs-6">Exam name</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <select class="form-select text-ttxt" id="answer_sheet" name="answersheet" required>
+              <option value="">--select--</option>
+              {% for sheet in answer_sheets %}
+                <option value="{{ sheet.id }}">{{ sheet.name }}</option>
+              {% endfor %}
+            </select>
+            <label class="form-label text-ttxt" for="answer_sheet">Select answer sheet</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <textarea class="form-control text-ttxt fs-6" id="exam_describe" placeholder="d" style="min-height:150px;" name="description"></textarea>
+            <label for="exam_describe" class="text-ttxt fs-6">Exam description/comment (if any)</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-3 text-end">
+            <button type="button" class="btn btn-danger d-inline-block me-2" id="exam_cancel_btn" data-bs-dismiss="offcanvas">Cancel</button>
+            <button type="submit" class="btn btn-success d-inline-block" id="exam_submit_btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+  <div class="modal fade" id="date_filter_modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-bblight">
+          <h5 class="modal-title text-white">Select range of dates..</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="date" class="form-control text-ttxt1" id="min_date" placeholder="d" />
+            <label for="min_date" class="text-ttxt1">Minimum date</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="date" class="form-control text-ttxt1" id="max_date" placeholder="d" />
+            <label for="max_date" class="text-ttxt1">Maximum date</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-long-arrow-left"></i></button>
+          <button type="button" class="btn btn-bblight text-white" id="date_clear"><i class="fas fa-refresh"></i></button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="date_filter_btn"><i class="fas fa-check-circle"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="{% static 'js/exams/exams.js' %}"></script>
+{% endblock %}

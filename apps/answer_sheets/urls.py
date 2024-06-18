@@ -8,4 +8,6 @@ urlpatterns = [
     path('download/<int:questions>/', v.download_answersheet, name='download_sheet'),
     path('custom-answer-sheets/list/', v.custom_sheets_list, name='custom_list'),
     path('save/custom-sheet/', v.save_custom_sheets, name='save_sheet'),
+    path('marking-schemes/', v.marking_schemes_list, name='marking_schemes_list'),
+    path('mark-scheme/<int:mark_scheme>/', v.marking_scheme_details, name='scheme_details'),
 ]

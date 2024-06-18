@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "halogen-chemist-425910-m7",
+  "private_key_id": "6dc450491b7e40f01275eb4081db2f5c2a0e357c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDcXZLx6dTrfT57\nfKW2t3bGjPIr7eeqsjTler83/8muzeDk8zLlOJfAzwNcpVlvCIKKCUTODw84eXgP\nbiFiaF1eAT87F/LZIrnlbjrs3sx1hoXneIEJ8ZAaEpswvKceY7XVFceBDal4F/P6\nGHiijtiI6Y/Y4Prj5NiDSBpwDWW3HY0BzdQ5ApMRSxENhWu7Zh0ydN92yDSU/6ii\nhFkATd+fwQqRrZiRaxdwg9RRdhfZdvsy4u3h6kt0Mugox3z/LTEYeVNOQ7I/Thqx\nU0io86U8eMB3BUHcZWGwNesSplshXTr3AUODh5T/dF76CsRmKETfYQfTeHnyj6jO\nRynIAoFFAgMBAAECggEADB+ECAOTxkQ3EA3OA3y+FFf2aZFrA+FN7fVroVzCga6G\n/j8vdwn1tiTkOZlt/UV8AiJWsLCGQrH3d3+P1OZmFbNH3KwbwYW/Q8n3zaHsMsL+\n9t8ARcXFL26WCn9/k0uQbHO/I3BpQg5j3NofyyYyXSFMSXXihUsR/RbxiNNvSWD7\nyyjkF4a8PJb8+Zussb1STAfKm5LhcpC2oW11EggFJTO6Vds5JVvtyndSZDyiTtCK\nJXT6y1QIB6lnOP67hfTfuSY9yBwxFyqbtT1WpFFFppjOtgrpj26UcGDWK+WSeGCi\nTiaGEg8kM+jyXnx3X8yQFMJdUjgOo1FfdSBElIF0eQKBgQD3Zt6xW8fGMfBQWe+u\n7WY7eBNVGO+0+B2eR+1hve+rfAqSIcyl4sy+K+Mqv/+bFYn+7UCTZ+8Q78Zz9JA8\nv1/0EN6SI5eu5JU9gLJd0dZEjaVGPZ/DPEANBLAiWt2rt+DQ+JIf8WQJ8VfXqgpi\nLzPC0+YLXc2Bhz7h0kgi4j1vMwKBgQDkBimYYG1PpiPEAancZHIigmxuB8Om99Z+\nUuo/qKh4tBfhWYNqSu8HcYEYkZfHru3zq62n2Von5Tt1jiFisB9H7A61hHF2CoJK\nhtWXKT37HalKEE09TDWHYUiUgh+B2fBYeJ+7CCSExc7+HLKSuNYLrbQBwO+KPrln\nCFmg8REtpwKBgQDRnybnLfXqF5wf6OQt2lZ54va2bseEFYq69wTKgW2WZiZqxRqq\nH64NIBB9w2qnE6v2BT5m53RnbFJBI6Im5pw9pyF+v4uhE2rkTqxS1B3xvfagukwo\n118J6MP4h/c0rTtetI7TY+u4hPZB9ICRyp7X4EUVsmgS7O451rtqWzlkgwKBgEO8\nQObu3gnnBIDZLag2fmEZ9TPKQqh6vtDPuJ4ob8NLXDyo5ozQrai8Yuj1duzuXekg\nenl963Ymdj85dVlnkCNBUC1DpqC2BnY1D4XTzoGmEf/aT9eBp/ULRRA4hzt/jhH5\n4xkgFhkK2a5KwBEtrwfRFcPfmEis0U52AIn6kmvJAoGAYAWuBHm1srZHbn8fbnR4\nXTVatUGDGS32WJ6YnqUV/Oj+iNQOyYsh0VJgeZ+V4MWz/++lLF1rrHIIJtyep/mE\neIdaF2YvBumudjOFyLRRfrt7iDQmoUmGGYOh2CJh/fAxdx0k8d28UyfGIRjUamJ/\nraZ68pUq1tLhhcIfoaZnQBg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "fidondeveloper@halogen-chemist-425910-m7.iam.gserviceaccount.com",
+  "client_id": "106534049917732753582",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fidondeveloper%40halogen-chemist-425910-m7.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -9,245 +9,212 @@
 {% endblock %}
 {% block contents %}
   {% if custom_form %}
-    {% if step == 1 %}
-      <form class="form_step1 d-inline-block mx-2 my-5 p-2" action="{% url 'save_sheet' %}" autocomplete="off" id="step_one_form">
-        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 1 of 3: Answer sheet names</div>
-        <div class="formsms w-100 float-start text-start my-1"></div>
-        <div class="form-floating d-block w-100 float-start my-1">
-          <input type="text" minlength="3" maxlength="64" class="form-control text-ttxt1" name="names" id="custom_name" value="{{ names }}" placeholder="p" required autofocus />
-          <label for="custom_name" class="form-label text-ttxt1">Enter sheet name</label>
-        </div>
-        <input type="hidden" name="step" value="2" />
-        <input type="hidden" name="sheet" value="{{ sheet }}" />
-        <div class="form-floating d-block w-100 float-start my-3 text-end">
-          <button type="submit" id="submit_sheetname_btn" class="btn btn-bblight text-white d-inline-block">Next <i class="fas fa-long-arrow-right"></i></button>
-        </div>
-      </form>
-    {% elif step == 2 %}
-      <form class="form_step2 d-inline-block mx-2 my-5 p-2" id="headerboxes_form" action="{% url 'save_sheet' %}" autocomplete="off">
-        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 2 of 3: Header fields</div>
-        <div class="formsms w-100 float-start text-start my-1"></div>
-        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 py-1">
-          <b>Answer sheet name:</b> {{ sheet_name }}
-        </div>
-        <table class="table float-start my-1 table-striped text-ttxt1 text-start align-middle">
-          <thead class="bg-bblight text-white">
-            <tr>
-              <th>Usage</th>
-              <th>Enabled</th>
-              <th>Displayed label</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if header_boxes %}
-              {% for hd in header_boxes %}
-                <tr>
-                  <td>{{ hd.header }}</td>
-                  <td class="text-center">
-                    <div class="form-check form-switch form-check-inline">
-                      {% if hd.enabled %}
-                        <input class="form-check-input" type="checkbox" checked />
-                      {% else %}
-                        <input class="form-check-input" type="checkbox" />
-                      {% endif %}
-                    </div>
-                  </td>
-                  <td>
-                    {% if hd.enabled %}
-                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" readonly />
-                    {% else %}
-                      <input type="text" class="form-control text-ttxt1" value="{{ hd.label }}" placeholder="Enter label" readonly disabled />
-                    {% endif %}
-                  </td>
-                </tr>
-              {% endfor %}
-            {% else %}
-              <tr>
-                <td>Reg#</td>
-                <td class="text-center">
-                  <div class="form-check form-switch form-check-inline">
-                    <input class="form-check-input" type="checkbox" checked />
-                  </div>
-                </td>
-                <td>
-                  <input type="text" class="form-control text-ttxt1" value="Student ID" placeholder="Enter label" readonly />
-                </td>
-              </tr>
-              <tr>
-                <td>Name</td>
-                <td class="text-center">
-                  <div class="form-check form-switch form-check-inline">
-                    <input class="form-check-input" type="checkbox" checked />
-                  </div>
-                </td>
-                <td>
-                  <input type="text" class="form-control text-ttxt1" value="Name" placeholder="Enter label" readonly />
-                </td>
-              </tr>
-              <tr>
-                <td>Exam</td>
-                <td class="text-center">
-                  <div class="form-check form-switch form-check-inline">
-                    <input class="form-check-input" type="checkbox" checked />
-                  </div>
-                </td>
-                <td>
-                  <input type="text" class="form-control text-ttxt1" value="Exam" placeholder="Enter label" readonly />
-                </td>
-              </tr>
-              <tr>
-                <td>Class</td>
-                <td class="text-center">
-                  <div class="form-check form-switch form-check-inline">
-                    <input class="form-check-input" type="checkbox" checked />
-                  </div>
-                </td>
-                <td>
-                  <input type="text" class="form-control text-ttxt1" value="Class" placeholder="Enter label" readonly />
-                </td>
-              </tr>
-            {% endif %}
-          </tbody>
-        </table>
-        <input type="hidden" value="{{ sheet }}" id="sheet_input_id" />
-        <div class="form-floating d-block w-100 float-start my-3">
-          <a href="{% url 'create_custom_sheet' 1 sheet %}" id="back_btn_1" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
-          <button type="submit" id="forward_btn_2" class="btn btn-bblight text-white d-inline-block float-end">Next <i class="fas fa-long-arrow-right"></i></button>
-        </div>
-      </form>
-    {% elif step == 3 %}
+    {% if step == 2 %}
       <input type="hidden" value="{{ sheet }}" id="custom_sheet_id" />
-      <form class="form_step4 mx-1 my-5 p-2 text-ttxt1" action="{% url 'save_sheet' %}" id="publish_sheet_form">
-        <div class="d-block w-100 float-start text-start fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 3 of 3: Define Questions</div>
+      <form class="form_step4 p-1 text-ttxt1" action="{% url 'save_sheet' %}" id="publish_sheet_form">
+        <div class="d-block w-100 float-start text-start fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 2 of 2: Define Questions</div>
         <div class="d-block w-100 float-start text-start fs-6 py-1">
           <b>Answer sheet name:</b> {{ sheet_name }}
         </div>
         <div class="formsms w-100 float-start text-start my-1"></div>
-        <table class="table float-start my-1 table-striped text-center text-ttxt1 align-middle" id="qns_table">
-          <thead class="bg-bblight text-white">
-            <tr>
-              <th>Number</th>
-              <th>Type</th>
-              <th>Labels</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if questions_list %}
-              {% for qns in questions_list %}
-                {% for question in qns.range %}
-                  {% if qns.type == 'multichoice' %}
-                    <tr class="tr_{{ qns.id }}">
-                      <td class="{{ qns.type }}"></td>
-                      <td class="text-start">Multi-choices</td>
-                      <td class="text-start">{{ qns.qns.qn_labels }}</td>
-                      <td>
-                        <div class="form-check d-inline-block">
-                          <input class="form-check-input" type="checkbox" />
-                        </div>
-                      </td>
-                    </tr>
-                  {% elif qns.type == 'verboselabel' %}
-                    <tr class="tr_{{ qns.id }}">
-                      <td class="{{ qns.type }}"></td>
-                      <td class="text-start">Verbose labels</td>
-                      <td class="text-start">
-                        <ul>
-                          {% for vb in qns.qns %}
-                            <li>{{ vb.short }}: {{ vb.long }}</li>
-                          {% endfor %}
-                        </ul>
-                      </td>
-                      <td>
-                        <div class="form-check d-inline-block">
-                          <input class="form-check-input" type="checkbox" />
-                        </div>
-                      </td>
-                    </tr>
-                  {% elif qns.type == 'verboseqns' %}
-                    <tr class="tr_{{ qns.id }}">
-                      <td class="{{ qns.type }}"></td>
-                      <td class="text-start">Verbose questions</td>
-                      <td class="text-start">Max chars: {{ qns.qns.chars }}</td>
-                      <td>
-                        <div class="form-check d-inline-block">
-                          <input class="form-check-input" type="checkbox" />
-                        </div>
-                      </td>
-                    </tr>
-                  {% endif %}
-                {% endfor %}
-              {% endfor %}
-              <tr id="select_qns_tr">
-                <td colspan="5" class="text-end py-3">
-                  <button type="button" id="remove_qns_btn" class="btn btn-bblight text-white"><i class="fas fa-trash"></i> Remove selected</button>
-                </td>
-              </tr>
-            {% else %}
+        <div class="d-block w-100 float-start table-responsive">
+          <table class="table float-start my-1 table-striped text-center text-ttxt1 align-middle w-10" id="qns_table">
+            <thead class="bg-bblight text-white">
               <tr>
-                <td colspan="5" class="py-5">No questions defined yet; Use below buttons to add questions.</td>
+                <th>#</th>
+                <th>Type</th>
+                <th>Labels</th>
+                <th>Marks</th>
+                <th></th>
               </tr>
-            {% endif %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% if questions_list %}
+                {% for qns in questions_list %}
+                  {% for question in qns.range %}
+                    {% if qns.type == 'multichoice' %}
+                      <tr class="tr_{{ qns.id }}">
+                        <td class="{{ qns.type }}"></td>
+                        <td class="text-start">Multi-choices</td>
+                        <td class="text-start">{{ qns.qns.qn_labels }}</td>
+                        <td>{{ qns.marks }}</td>
+                        <td>
+                          <div class="form-check d-inline-block">
+                            <input class="form-check-input" type="checkbox" />
+                          </div>
+                        </td>
+                      </tr>
+                    {% elif qns.type == 'verboseqns' %}
+                      <tr class="tr_{{ qns.id }}">
+                        <td class="{{ qns.type }}"></td>
+                        <td class="text-start">Verbose questions</td>
+                        <td class="text-start">Max chars: {{ qns.qns.chars }}</td>
+                        <td>{{ qns.marks }}</td>
+                        <td>
+                          <div class="form-check d-inline-block">
+                            <input class="form-check-input" type="checkbox" />
+                          </div>
+                        </td>
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+                <tr id="select_qns_tr">
+                  <td colspan="5" class="text-end py-3">
+                    <button type="button" id="remove_qns_btn" class="btn btn-bblight text-white"><i class="fas fa-trash"></i> Remove selected</button>
+                  </td>
+                </tr>
+              {% else %}
+                <tr class="no-qns">
+                  <td colspan="5" class="py-5">No questions defined yet; Use below buttons to add questions.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
         <div class="form-floating d-block w-100 float-start my-3 text-start">
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#multi_choice_modal">Add multiple-choice questions</button>
-          {% comment %} <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_label_modal">Add verbose label questions</button> {% endcomment %}
           <button type="button" class="btn btn-bblue d-inline-block m-1" data-bs-toggle="modal" data-bs-target="#verbose_questions_modal">Add verbose questions</button>
           <button type="button" class="btn btn-bblue d-inline-block m-1" onclick="print()">Print</button>
         </div>
         <div class="form-floating d-block w-100 float-start my-3">
-          <a href="{% url 'create_custom_sheet' 3 sheet %}" id="cancel_publish_btn" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
+          <a href="{% url 'create_custom_sheet' 1 sheet %}" id="cancel_publish_btn" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
           <button type="button" id="publish_btn" class="btn btn-bblight text-white d-inline float-end" data-bs-toggle="modal" data-bs-target="#confirm_publish_modal">Publish <i class="fas fa-check-circle"></i></button>
         </div>
       </form>
 
       {% comment %}answer-sheet for preview{% endcomment %}
       <div class="answer_sheet">
-        <input type="hidden" id="header_boxes_input" value="{{ header_boxes }}" />
-        <input type="hidden" id="id_section_input" value="{{ id_section }}" />
-        <input type="hidden" id="keys_section_input" value="{{ keys_section }}" />
         <div class="d-block w-100" id="sheet_view">
-          <div id="answers_div">
-            {% comment %} <div class="multichoice">
-              <span>1</span>
-              <span>A</span>
-              <span>B</span>
-              <span>C</span>
-              <span>D</span>
-              <span>E</span>
+          <div class="sheeet_head">
+            <div class="heading">
+              <span>{{ heading|linebreaks }}</span>
             </div>
-            <div class="multilabel">
+            <div class="regnumber">
               <div>
-                <span class="circle">2</span>
-                <span class="circle">.</span>
-                <span class="text">A: Computer</span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
               <div>
-                <span class="circle">.</span>
-                <span class="circle">.</span>
-                <span class="text">B: Laptop</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
               </div>
               <div>
-                <span class="circle">.</span>
-                <span class="circle">.</span>
-                <span class="text">C: Desktop</span>
+                <span>1</span>
+                <span>1</span>
+                <span>1</span>
+                <span>1</span>
+                <span>1</span>
+                <span>1</span>
+                <span>1</span>
+                <span>1</span>
+                <span>1</span>
+              </div>
+              <div>
+                <span>2</span>
+                <span>2</span>
+                <span>2</span>
+                <span>2</span>
+                <span>2</span>
+                <span>2</span>
+                <span>2</span>
+                <span>2</span>
+                <span>2</span>
+              </div>
+              <div>
+                <span>3</span>
+                <span>3</span>
+                <span>3</span>
+                <span>3</span>
+                <span>3</span>
+                <span>3</span>
+                <span>3</span>
+                <span>3</span>
+                <span>3</span>
+              </div>
+              <div>
+                <span>4</span>
+                <span>4</span>
+                <span>4</span>
+                <span>4</span>
+                <span>4</span>
+                <span>4</span>
+                <span>4</span>
+                <span>4</span>
+                <span>4</span>
+              </div>
+              <div>
+                <span>5</span>
+                <span>5</span>
+                <span>5</span>
+                <span>5</span>
+                <span>5</span>
+                <span>5</span>
+                <span>5</span>
+                <span>5</span>
+                <span>5</span>
+              </div>
+              <div>
+                <span>6</span>
+                <span>6</span>
+                <span>6</span>
+                <span>6</span>
+                <span>6</span>
+                <span>6</span>
+                <span>6</span>
+                <span>6</span>
+                <span>6</span>
+              </div>
+              <div>
+                <span>7</span>
+                <span>7</span>
+                <span>7</span>
+                <span>7</span>
+                <span>7</span>
+                <span>7</span>
+                <span>7</span>
+                <span>7</span>
+                <span>7</span>
+              </div>
+              <div>
+                <span>8</span>
+                <span>8</span>
+                <span>8</span>
+                <span>8</span>
+                <span>8</span>
+                <span>8</span>
+                <span>8</span>
+                <span>8</span>
+                <span>8</span>
+              </div>
+              <div>
+                <span>9</span>
+                <span>9</span>
+                <span>9</span>
+                <span>9</span>
+                <span>9</span>
+                <span>9</span>
+                <span>9</span>
+                <span>9</span>
+                <span>9</span>
               </div>
             </div>
-            <div class="verbose">
-              <span>3</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-            </div> {% endcomment %}
           </div>
+          <div id="answers_div"></div>
         </div>
       </div>
 
@@ -280,70 +247,16 @@
                 <input type="text" maxlength="10" minlength="2" class="form-control text-ttxt1" id="multi_labels" pattern="[A-Za-z]+" value="ABCDE" placeholder="d" required />
                 <label for="multi_labels" class="form-label text-ttxt1">Answer labels</label>
               </div>
+              <div class="form-floating d-block w-100 float-start my-1">
+                <input type="number" min="0" max="100" step="0.01" class="form-control text-ttxt1" id="multichoices_marks" placeholder="p" required />
+                <label class="form-label text-ttxt1" for="multichoices_marks">Enter marks per question</label>
+              </div>
             </div>
             <input type="hidden" value="multichoice" id="qn_type_multichoice" />
             <div class="form-floating d-block w-100 float-start text-ttxt1 text-start px-3 mb-3">The letters to be used for labels for this question; entered with no spaces. For example, ABCDE or TF. Enter up to 10 letters.</div>
             <div class="modal-footer">
               <button type="button" class="btn btn-ttxt1 text-white" data-bs-dismiss="modal" id="cancel_multi_btn">Close</button>
               <button type="submit" class="btn btn-bblight text-white" id="submit_multi_btn">Add questions</button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      {% comment %}modal to add verbose label questions{% endcomment %}
-      <div class="modal fade" id="verbose_label_modal">
-        <form class="modal-dialog" id="verbose_label_form" action="{% url 'save_sheet' %}" autocomplete="on">
-          <div class="modal-content">
-            <div class="modal-header bg-bblight">
-              <h5 class="modal-title text-white">Add verbose-label questions..</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <div class="formsms w-100 float-start text-start my-1"></div>
-              <div class="form-floating d-block w-100 float-start my-1">
-                <select class="form-select text-ttxt1" id="v_label_num_questions" required>
-                  {% for qn in questions %}
-                    <option value="{{ qn }}">{{ qn }}</option>
-                  {% endfor %}
-                </select>
-                <label class="form-label text-ttxt1" for="v_label_num_questions">Select number of questions</label>
-              </div>
-              {% comment %} <div class="form-floating d-block w-100 float-start my-1">
-                <select class="form-select text-ttxt1" id="v_show_labels" required>
-                  <option value="1">Show short label</option>
-                  <option value="0">Hide short label</option>
-                </select>
-                <label class="form-label text-ttxt1" for="v_show_labels">Display short labels on answer sheet</label>
-              </div> {% endcomment %}
-              <div class="form-floating d-block w-100 float-start my-1">
-                <table class="table w-100 float-start table-striped text-ttxt1 table_labels">
-                  <thead class="bg-bblight text-white">
-                    <tr>
-                      <th class="text-start">Short label</th>
-                      <th class="text-start">Verbose label</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for lb in v_labels %}
-                      <tr>
-                        <td style="width:30px;">
-                          <input type="text" maxlength="1" minlength="1" pattern="[A-Za-z]+" class="l_short form-control text-ttxt1" />
-                        </td>
-                        <td>
-                          <input type="text" minlength="3" class="l_long form-control text-ttxt1" />
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-              <input type="hidden" value="verboselabel" id="qn_type_verboselabel" />
-              <div class="form-floating d-block w-100 float-start text-ttxt1 text-start px-3 mb-3">Enter up to 10 verbose answers. Each answer must have a unique short label of one character for display within the app and a verbose label.</div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-ttxt1 text-white" data-bs-dismiss="modal" id="cancel_vlabel_btn">Close</button>
-              <button type="submit" class="btn btn-bblight text-white" id="submit_vlabel_btn">Add questions</button>
             </div>
           </div>
         </form>
@@ -375,6 +288,10 @@
                 </select>
                 <label class="form-label text-ttxt1" for="verb_num_chars">Select max length of answer</label>
               </div>
+              <div class="form-floating d-block w-100 float-start my-1">
+                <input type="number" min="0" max="100" step="0.01" class="form-control text-ttxt1" id="verbose_marks" placeholder="p" required />
+                <label class="form-label text-ttxt1" for="verbose_marks">Enter marks per question</label>
+              </div>
               <input type="hidden" value="verboseqns" id="qn_type_verboseqns" />
             </div>
             <div class="modal-footer">
@@ -396,7 +313,7 @@
             <div class="modal-body">
               <div class="formsms w-100 float-start text-start my-1"></div>
               <div class="form-floating d-block w-100 float-start my-4 px-2">
-                You're about to publish <b>{{ sheet_name }}</b> answer sheet;<br />you won't be able to do any further modifications.<br />Are you sure to continue..?
+                You're about to publish <b>{{ sheet_name }}</b> answer sheet, Continue..?
               </div>
             </div>
             <div class="modal-footer">
@@ -406,6 +323,25 @@
           </form>
         </div>
       </div>
+    {% else %}
+      <form class="form_step1 d-inline-block p-1" action="{% url 'save_sheet' %}" autocomplete="off" id="step_one_form">
+        <div class="d-block w-100 float-start text-start text-ttxt1 fs-6 border-bottom border-ttxt1 py-1 mb-3">Step 1 of 2: Answer sheet names & heading</div>
+        <div class="formsms w-100 float-start text-start my-1"></div>
+        <div class="form-floating d-block w-100 float-start my-1">
+          <input type="text" minlength="3" maxlength="64" class="form-control text-ttxt1" name="names" id="custom_name" value="{{ names }}" placeholder="p" required autofocus />
+          <label for="custom_name" class="form-label text-ttxt1">Enter sheet name</label>
+        </div>
+        <div class="form-floating d-block w-100 float-start my-1">
+          <textarea class="form-control text-ttxt1" name="heading" id="custom_heading" style="min-height:300px;" placeholder="p" required>{{ heading }}</textarea>
+          <label for="custom_heading" class="form-label text-ttxt1">Answer sheet heanding</label>
+        </div>
+        <input type="hidden" name="step" value="2" />
+        <input type="hidden" name="sheet" value="{{ sheet }}" />
+        <div class="form-floating d-block w-100 float-start my-3 text-end">
+          <a href="{% url 'custom_list' %}" id="cancel_publish_btn" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
+          <button type="submit" id="submit_sheetname_btn" class="btn btn-bblight text-white d-inline-block">Next <i class="fas fa-long-arrow-right"></i></button>
+        </div>
+      </form>
     {% endif %}
   {% else %}
     <div class="d-block w-100 float-start p-2 text-start">

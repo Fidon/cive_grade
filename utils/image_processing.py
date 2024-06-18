@@ -1,233 +1,267 @@
 import cv2
 import numpy as np
-import subprocess
-
-# step 1
-def convert_image_to_grayscale(self):
-    self.grayscale_image = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-
-def threshold_image(self):
-    self.thresholded_image = cv2.threshold(self.grayscale_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-
-def invert_image(self):
-    self.inverted_image = cv2.bitwise_not(self.thresholded_image)
-
-def dilate_image(self):
-    self.dilated_image = cv2.dilate(self.inverted_image, None, iterations=5)
+import itertools
+import os
+from google.cloud import vision
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.path.join(os.path.dirname(__file__), 'google_lens.json')
 
 
-
-# step 2
-def find_contours(self):
-    self.contours, self.hierarchy = cv2.findContours(self.dilated_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # self.image_with_all_contours = self.image.copy()
-    # cv2.drawContours(self.image_with_all_contours, self.contours, -1, (0, 255, 0), 3)
-
-def filter_contours_and_leave_only_rectangles(self):
-    self.rectangular_contours = []
-    for contour in self.contours:
-        peri = cv2.arcLength(contour, True)
-        approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
-        if len(approx) == 4:
-            self.rectangular_contours.append(approx)
-    # self.image_with_only_rectangular_contours = self.image.copy()
-    # cv2.drawContours(self.image_with_only_rectangular_contours, self.rectangular_contours, -1, (0, 255, 0), 3)
-
-def find_largest_contour_by_area(self):
-    max_area = 0
-    self.contour_with_max_area = None
-    for contour in self.rectangular_contours:
-        area = cv2.contourArea(contour)
-        if area > max_area:
-            max_area = area
-            self.contour_with_max_area = contour
-    self.image_with_contour_with_max_area = self.image.copy()
-    cv2.drawContours(self.image_with_contour_with_max_area, [self.contour_with_max_area], -1, (0, 255, 0), 3)
+# Function to check if two rectangles overlap
+def rectangles_overlap(rect1, rect2):
+  left1, top1, right1, bottom1 = rect1
+  left2, top2, right2, bottom2 = rect2
+  return not (right1 < left2 or right2 < left1 or bottom1 < top2 or bottom2 < top1)
 
 
+# Function to merge two rectangles
+def merge_rectangles(rect1, rect2):
+  left1, top1, right1, bottom1 = rect1
+  left2, top2, right2, bottom2 = rect2
+  left = min(left1, left2)
+  top = min(top1, top2)
+  right = max(right1, right2)
+  bottom = max(bottom1, bottom2)
+  return (left, top, right, bottom)
 
-# step 3
-def order_points_in_the_contour_with_max_area(self):
-    self.contour_with_max_area_ordered = self.order_points(self.contour_with_max_area)
-    # The code below is to plot the points on the image but not required for the perspective transform
-    self.image_with_points_plotted = self.image.copy()
-    for point in self.contour_with_max_area_ordered:
-        point_coordinates = (int(point[0]), int(point[1]))
-        self.image_with_points_plotted = cv2.circle(self.image_with_points_plotted, point_coordinates, 10, (0, 0, 255), -1)
 
-def calculate_new_width_and_height_of_image(self):
-    existing_image_width = self.image.shape[1]
-    existing_image_width_reduced_by_10_percent = int(existing_image_width * 0.9)
+# Function to perform OCR
+def detect_text(image_content):
+  client = vision.ImageAnnotatorClient()
+  image = vision.Image(content=image_content)
+  response = client.document_text_detection(image=image)
+  detected_texts = []
+  if response.full_text_annotation:
+    for page in response.full_text_annotation.pages:
+      for block in page.blocks:
+        for paragraph in block.paragraphs:
+          for word in paragraph.words:
+            word_text = "".join([symbol.text for symbol in word.symbols])
+            filtered_text = ''.join([char.upper() for char in word_text if char.isdigit() or 'A' <= char.upper() <= 'Z'])
+            detected_texts.append(filtered_text)
+
+  if response.error.message:
+    raise Exception(
+      f"{response.error.message}"
+    )
+
+  return "".join(detected_texts)
+
+
+# Function to detect squares and read text in it
+def mark_square_questions(img_path, square_ranges, squares_count):
+  padding = 30
+  extra_width = 20
+  img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+  grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  image_height, image_width = grayscale.shape
+  _, threshold = cv2.threshold(grayscale, 155, 255, cv2.THRESH_BINARY)
+  contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+  contours = sorted(contours, key=lambda c: (cv2.boundingRect(c)[1], cv2.boundingRect(c)[0]))
+
+  squares_list = []
+  for contour in contours:
+    approx = cv2.approxPolyDP(contour, 0.02 * cv2.arcLength(contour, True), True)
+    if len(approx) == 4:
+      area = cv2.contourArea(contour)
+      x, y, w, h = cv2.boundingRect(approx)
+      aspect_ratio = float(w) / h
+      if 10000 <= area <= 14000 and 0.8 <= aspect_ratio <= 1.2:
+        squares_list.append((x, y, w, h))
+
+  # Add padding to each row of squares and store rectangles
+  rectangles = []
+  for _, group in itertools.groupby(squares_list, key=lambda x: x[1] // (2 * padding)):
+    squares_sorted_horizontally = sorted(group, key=lambda x: x[0])
+
+    leftmost_x, rightmost_x = float('inf'), float('-inf')
+
+    # Find leftmost and rightmost square edges
+    for square in squares_sorted_horizontally:
+      leftmost_x = min(leftmost_x, square[0])
+      rightmost_x = max(rightmost_x, square[0] + square[2])
+
+    # Calculate rectangle left and right coordinates with padding and extra width
+    left = int(leftmost_x - padding - extra_width / 2)
+    right = int(rightmost_x + padding + extra_width / 2)
+
+    top_y_square = min(squares_sorted_horizontally, key=lambda x: x[1])[1]
+    bottom_y_square = max(squares_sorted_horizontally, key=lambda x: x[1])[1]
+    height_squares = bottom_y_square - top_y_square
+    center_y = int((top_y_square + bottom_y_square) / 2)
+
+    top = center_y - int(height_squares / 2)
+    bottom = center_y + int(height_squares / 2)
+    rectangles.append((0, top, image_width-1, bottom+50))
+
+  # Merge overlapping rectangles
+  merged_rectangles = []
+  for rect in rectangles:
+    if not merged_rectangles:
+      merged_rectangles.append(rect)
+    else:
+      merged = False
+      for i in range(len(merged_rectangles)):
+        if rectangles_overlap(merged_rectangles[i], rect):
+          merged_rectangles[i] = merge_rectangles(merged_rectangles[i], rect)
+          merged = True
+          break
+      if not merged:
+        merged_rectangles.append(rect)
+
+  # Re-index squares within merged rectangles
+  sorted_squares, new_index = [], 0
+  for (left, top, right, bottom) in merged_rectangles:
+    cv2.rectangle(img, (left, top), (right, bottom), (255, 0, 0), 2)
+    squares_in_rectangle = []
+
+    for (x, y, w, h) in squares_list:
+      if left <= x <= right and top <= y <= bottom:
+        squares_in_rectangle.append((x, y, w, h))
+
+    # Sort squares in the rectangle by x-coordinate
+    squares_in_rectangle_sorted = sorted(squares_in_rectangle, key=lambda x: x[0])
+
+    # Re-index the squares and draw the new indices
+    for (x, y, w, h) in squares_in_rectangle_sorted:
+      sorted_squares.append((x, y, w, h))
+      new_index += 1
+
+  def merge_squares_into_rectangle(indices):
+    if not indices:
+      return None
+
+    # Extract coordinates of squares to be merged
+    squares_to_merge = [sorted_squares[i] for i in indices]
     
-    distance_between_top_left_and_top_right = self.calculateDistanceBetween2Points(self.contour_with_max_area_ordered[0], self.contour_with_max_area_ordered[1])
-    distance_between_top_left_and_bottom_left = self.calculateDistanceBetween2Points(self.contour_with_max_area_ordered[0], self.contour_with_max_area_ordered[3])
+    # Calculate the bounding box of the merged squares
+    x_coords = [x for x, _, _, _ in squares_to_merge]
+    y_coords = [y for _, y, _, _ in squares_to_merge]
+    w_coords = [x + w for x, _, w, _ in squares_to_merge]
+    h_coords = [y + h for _, y, _, h in squares_to_merge]
 
-    aspect_ratio = distance_between_top_left_and_bottom_left / distance_between_top_left_and_top_right
+    left = min(x_coords)
+    top = min(y_coords)
+    right = max(w_coords)
+    bottom = max(h_coords)
 
-    self.new_image_width = existing_image_width_reduced_by_10_percent
-    self.new_image_height = int(self.new_image_width * aspect_ratio)
+    return left, top, right, bottom
 
-def apply_perspective_transform(self):
-    pts1 = np.float32(self.contour_with_max_area_ordered)
-    pts2 = np.float32([[0, 0], [self.new_image_width, 0], [self.new_image_width, self.new_image_height], [0, self.new_image_height]])
-    matrix = cv2.getPerspectiveTransform(pts1, pts2)
-    self.perspective_corrected_image = cv2.warpPerspective(self.image, matrix, (self.new_image_width, self.new_image_height))
+  # Define a function to process each range of squares
+  def process_square_range(start, end):
+    indices = list(range(start, end+1))
+    merged_rect = merge_squares_into_rectangle(indices)
 
-# Below are helper functions
-def calculateDistanceBetween2Points(self, p1, p2):
-    dis = ((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2) ** 0.5
-    return dis
+    extracted_text = ""
+    if merged_rect:
+      left, top, right, bottom = merged_rect
 
-def order_points(self, pts):
-    pts = pts.reshape(4, 2)
-    rect = np.zeros((4, 2), dtype="float32")
-    
-    s = pts.sum(axis=1)
-    rect[0] = pts[np.argmin(s)]
-    rect[2] = pts[np.argmax(s)]
-    
-    diff = np.diff(pts, axis=1)
-    rect[1] = pts[np.argmin(diff)]
-    rect[3] = pts[np.argmax(diff)]
+      # Extract the region inside the merged rectangle
+      merged_image = threshold[top:bottom, left:right]
+      success, encoded_image = cv2.imencode('.png', merged_image)
+      if success:
+        image_content = encoded_image.tobytes()
+        extracted_text = detect_text(image_content)
+    return extracted_text
 
-    # return the ordered coordinates
-    return rect
+  words_list = []
+  if len(squares_list) == squares_count:
+    for item in square_ranges:
+      first_idx, last_idx = map(int, item.split('-'))
+      word_detected = process_square_range(first_idx, last_idx)
+      words_list.append(word_detected)
 
-def add_10_percent_padding(self):
-    image_height = self.image.shape[0]
-    padding = int(image_height * 0.1)
-    self.perspective_corrected_image_with_padding = cv2.copyMakeBorder(self.perspective_corrected_image, padding, padding, padding, padding, cv2.BORDER_CONSTANT, value=[255, 255, 255])
-
-
-
-# step 4
-def grayscale_image(self):
-    self.grey = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-
-def threshold_image(self):
-    self.thresholded_image = cv2.threshold(self.grey, 127, 255, cv2.THRESH_BINARY)[1]
-
-def invert_image(self):
-    self.inverted_image = cv2.bitwise_not(self.thresholded_image)
+  return len(squares_list), words_list
 
 
-# step 5
-def erode_vertical_lines(self):
-    hor = np.array([[1,1,1,1,1,1]])
-    self.vertical_lines_eroded_image = cv2.erode(self.inverted_image, hor, iterations=10)
-    self.vertical_lines_eroded_image = cv2.dilate(self.vertical_lines_eroded_image, hor, iterations=10)
+# Function to detect circles & shaded circles
+def mark_circle_questions(img_path):
+  img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+  grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  image_height, image_width = grayscale.shape
+  _, binary_img = cv2.threshold(grayscale, 67, 255, cv2.THRESH_BINARY)
+  blur_image = cv2.blur(grayscale, (3, 3))
 
-def erode_horizontal_lines(self):
-    ver = np.array([[1],
-            [1],
-            [1],
-            [1],
-            [1],
-            [1],
-            [1]])
-    self.horizontal_lines_eroded_image = cv2.erode(self.inverted_image, ver, iterations=10)
-    self.horizontal_lines_eroded_image = cv2.dilate(self.horizontal_lines_eroded_image, ver, iterations=10)
+  # Initialize lists to store shaded circles and their indices
+  shaded_circles, shaded_circles_index = [], []
 
-def combine_eroded_images(self):
-    self.combined_image = cv2.add(self.vertical_lines_eroded_image, self.horizontal_lines_eroded_image)
+  # Parameters
+  padding = 20
+  extra_width = 15
+  detected_circles = cv2.HoughCircles(blur_image, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=40, maxRadius=50)
 
-def dilate_combined_image_to_make_lines_thicker(self):
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    self.combined_image_dilated = cv2.dilate(self.combined_image, kernel, iterations=5)
+  if detected_circles is not None:
+    detected_circles = np.uint16(np.around(detected_circles))
+    detected_circles_sorted = detected_circles[0, :][detected_circles[0, :, 1].argsort()]
+    row_padding = []
 
+    for _, group in itertools.groupby(detected_circles_sorted, key=lambda x: (x[1] // (2 * padding))):
+      circles_sorted_horizontally = sorted(group, key=lambda x: x[0])
+      row_padding.append(circles_sorted_horizontally)
 
+    # List to store rectangles
+    rectangles = []
+    for row in row_padding:
+      top = min(row, key=lambda x: x[1])[1] - padding
+      bottom = max(row, key=lambda x: x[1])[1] + padding
+      left = min(row, key=lambda x: x[0])[0] - padding - extra_width
+      right = max(row, key=lambda x: x[0])[0] + padding + extra_width
 
-# step 6
-def subtract_combined_and_dilated_image_from_original_image(self):
-    self.image_without_lines = cv2.subtract(self.inverted_image, self.combined_image_dilated)
+      # Store rectangle
+      rectangles.append((0, top, image_width-1, bottom))
 
-def remove_noise_with_erode_and_dilate(self):
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    self.image_without_lines_noise_removed = cv2.erode(self.image_without_lines, kernel, iterations=1)
-    self.image_without_lines_noise_removed = cv2.dilate(self.image_without_lines_noise_removed, kernel, iterations=1)
+      for index, point in enumerate(row):
+        x, y, r = point[0], point[1], point[2]
 
-
-
-
-# step 7: Finding the cells
-def dilate_image(self):
-    kernel_to_remove_gaps_between_words = np.array([
-            [1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1]
-    ])
-    self.dilated_image = cv2.dilate(self.thresholded_image, kernel_to_remove_gaps_between_words, iterations=5)
-    simple_kernel = np.ones((5,5), np.uint8)
-    self.dilated_image = cv2.dilate(self.dilated_image, simple_kernel, iterations=2)
-
-def find_contours(self):
-    result = cv2.findContours(self.dilated_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    self.contours = result[0]
-    # The code below is for visualization purposes only but not necessary for the OCR to work.
-    self.image_with_contours_drawn = self.original_image.copy()
-    cv2.drawContours(self.image_with_contours_drawn, self.contours, -1, (0, 255, 0), 3)
-
-def convert_contours_to_bounding_boxes(self):
-    self.bounding_boxes = []
-    self.image_with_all_bounding_boxes = self.original_image.copy()
-    for contour in self.contours:
-        x, y, w, h = cv2.boundingRect(contour)
-        self.bounding_boxes.append((x, y, w, h))
-        # This line below draws a rectangle on the image with the shape of the bounding box
-        self.image_with_all_bounding_boxes = cv2.rectangle(self.image_with_all_bounding_boxes, (x, y), (x + w, y + h), (0, 255, 0), 5)
+        # Find and mark shaded circles
+        zero_pixel_count = 0
+        for i in range(max(0, y - r), min(binary_img.shape[0], y + r + 1)):
+          for j in range(max(0, x - r), min(binary_img.shape[1], x + r + 1)):
+            if ((i - y) ** 2 + (j - x) ** 2) <= r ** 2:
+              if binary_img[i, j] == 0:
+                zero_pixel_count += 1
+        
+        if zero_pixel_count > 999:
+          shaded_circles.append((x, y, r))
 
 
+    # Merge overlapping rectangles
+    merged_rectangles = []
+    for rect in rectangles:
+      if not merged_rectangles:
+        merged_rectangles.append(rect)
+      else:
+        merged = False
+        for i in range(len(merged_rectangles)):
+          if rectangles_overlap(merged_rectangles[i], rect):
+            merged_rectangles[i] = merge_rectangles(merged_rectangles[i], rect)
+            merged = True
+            break
+        if not merged:
+          merged_rectangles.append(rect)
 
-# step 8: Sorting The Bounding Boxes By X And Y Coordinates To Make Rows And Columns
-def get_mean_height_of_bounding_boxes(self):
-    heights = []
-    for bounding_box in self.bounding_boxes:
-        x, y, w, h = bounding_box
-        heights.append(h)
-    return np.mean(heights)
+    # List to store final circle indices
+    all_circles = []
 
-def sort_bounding_boxes_by_y_coordinate(self):
-    self.bounding_boxes = sorted(self.bounding_boxes, key=lambda x: x[1])
+    # Re-index circles within merged rectangles
+    new_index = 0
+    for (left, top, right, bottom) in merged_rectangles:
+      circles_in_rectangle = []
+      for row in row_padding:
+        for point in row:
+          x, y, r = point[0], point[1], point[2]
+          if left <= x <= right and top <= y <= bottom:
+            circles_in_rectangle.append((x, y, r))
 
-def club_all_bounding_boxes_by_similar_y_coordinates_into_rows(self):
-    self.rows = []
-    half_of_mean_height = self.mean_height / 2
-    current_row = [ self.bounding_boxes[0] ]
-    for bounding_box in self.bounding_boxes[1:]:
-        current_bounding_box_y = bounding_box[1]
-        previous_bounding_box_y = current_row[-1][1]
-        distance_between_bounding_boxes = abs(current_bounding_box_y - previous_bounding_box_y)
-        if distance_between_bounding_boxes <= half_of_mean_height:
-            current_row.append(bounding_box)
-        else:
-            self.rows.append(current_row)
-            current_row = [ bounding_box ]
-    self.rows.append(current_row)
+      # Sort circles in the rectangle by x-coordinate
+      circles_in_rectangle_sorted = sorted(circles_in_rectangle, key=lambda x: x[0])
 
-def sort_all_rows_by_x_coordinate(self):
-    for row in self.rows:
-        row.sort(key=lambda x: x[0])
+      # Re-index the circles and draw the new indices
+      for (x, y, r) in circles_in_rectangle_sorted:
+        all_circles.append((x, y, r, new_index))
+        if (x, y, r) in shaded_circles:
+          shaded_circles_index.append(new_index)
+        new_index += 1
 
+    return len(detected_circles_sorted), shaded_circles_index
+  return 0, []
 
-
-# step 9: Extracting The Text From The Bounding Boxes Using OCR
-def crop_each_bounding_box_and_ocr(self):
-    self.table = []
-    current_row = []
-    image_number = 0
-    for row in self.rows:
-        for bounding_box in row:
-            x, y, w, h = bounding_box
-            y = y - 5
-            cropped_image = self.original_image[y:y+h, x:x+w]
-            image_slice_path = "./ocr_slices/img_" + str(image_number) + ".jpg"
-            cv2.imwrite(image_slice_path, cropped_image)
-            results_from_ocr = self.get_result_from_tersseract(image_slice_path)
-            current_row.append(results_from_ocr)
-            image_number += 1
-        self.table.append(current_row)
-        current_row = []
-
-def get_result_from_tersseract(self, image_path):
-    output = subprocess.getoutput('tesseract ' + image_path + ' - -l eng --oem 3 --psm 7 --dpi 72 -c tessedit_char_whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789().calmg* "')
-    output = output.strip()
-    return output

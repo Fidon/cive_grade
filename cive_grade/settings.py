@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'apps.answer_sheets',
+    'apps.marking_scheme',
     'apps.classes',
     'apps.exams',
     'apps.students',

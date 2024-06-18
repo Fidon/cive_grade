@@ -4,91 +4,17 @@ $(function () {
     var remove_questions = true;
     var row_number_added = false;
 
-    function sort_questions() {
-        var parent = $('#answers_div');
-        var lastChild = parent.children(':last-child');
-
-        var parentWidth = parent.width();
-        var parentHeight = parent.height();
-        var lastChildWidth = lastChild.width();
-        var lastChildHeight = lastChild.height();
-
-        var overlap = false;
-        var randomLeft, randomTop;
-
-        do {
-            randomLeft = Math.floor(Math.random() * (parentWidth - lastChildWidth));
-            randomTop = Math.floor(Math.random() * (parentHeight - lastChildHeight));
-
-            // Check for collision with existing child divs
-            overlap = false;
-            parent.children('.child').each(function() {
-                var thisLeft = $(this).position().left;
-                var thisTop = $(this).position().top;
-                var thisWidth = $(this).width();
-                var thisHeight = $(this).height();
-
-                if (!(randomLeft + lastChildWidth < thisLeft || randomLeft > thisLeft + thisWidth || 
-                    randomTop + lastChildHeight < thisTop || randomTop > thisTop + thisHeight)) {
-                    overlap = true;
-                    return false; // Exit the loop if overlap is found
-                }
-            });
-        } while (overlap);
-
-        // Position the last child div
-        lastChild.css({left: randomLeft, top: randomTop});
-    }
-
-    // parse string into js object/array
-    function parseInput(inputId) {
-        var input = $(inputId).val().replace(/'/g, '"').replace(/True/g, 'true').replace(/False/g, 'false');
-        return JSON.parse(input);
-    }
-
     function add_row_number() {
         if (row_number_added == false) {
             row_count = $("#qns_table tbody tr").length;
+            var html_contents = ``;
+
             $("#qns_table tbody tr").each(function (index, element) {
                 if(index <= (row_count-2)) {
                     $(this).find('td:nth-child(1)').text(index+1);
                 }
-            });
 
-            var html_contents = ``;
-            var header_boxes = parseInput("#header_boxes_input");
-            var box_width = ((header_boxes[2].enabled) && (header_boxes[3].enabled)) ? "w-50" : "w-100";
-            
-            if (header_boxes[0].enabled) {
-                html_contents += `<div class="sheeet_head">` +
-                `<div class="title">Student ID:</div>` +
-                `<div class="id_boxes">`;
-                for (let i=0; i<18; i++) { html_contents += `<span></span>`; }
-                html_contents += `</div></div>`;
-            }
-            if (header_boxes[2].enabled) {
-                html_contents += `<div class="sheeet_head ${box_width}">` +
-                `<div class="title">Exam:</div>` +
-                `<div class="id_boxes">`;
-                for (let i=0; i<7; i++) { html_contents += `<span></span>`; }
-                html_contents += `</div></div>`;
-            }
-            if (header_boxes[3].enabled) {
-                html_contents += `<div class="sheeet_head ${box_width}">` +
-                `<div class="title">Class:</div>` +
-                `<div class="id_boxes">`;
-                for (let i=0; i<7; i++) { html_contents += `<span></span>`; }
-                html_contents += `</div></div>`;
-            }
-            if (header_boxes[1].enabled) {
-                html_contents += `<div class="sheeet_head m-0">` +
-                `<div class="title">Names:</div>` +
-                `<div class="box"></div></div>`;
-            }
-            $('#answers_div').before(html_contents);
-
-            $("#qns_table tbody tr").each(function (index, element) {
-                if(!($(this).attr('id') == "select_qns_tr")) {
+                if(($(this).attr('id') !== "select_qns_tr") && ($(this).attr('class') !== "no-qns")) {
                     var question_type = $(this).find('td:nth-child(1)').attr('class');
                     var question_number = $(this).find('td:nth-child(1)').text();
                     var question_labels = "";
@@ -96,27 +22,16 @@ $(function () {
                     
                     if (question_type == "multichoice") {
                         question_labels = $(this).find('td:nth-child(3)').text();
-                        html_contents += `<div class="multichoice"><span>${question_number}</span>`;
-                        for (let i=0; i<question_labels.length; i++) { html_contents += `<span>${question_labels[i]}</span>` }
-                        html_contents += `</div>`;
-                    } else if (question_type == "verboselabel") {
-                        var label_list = [];
-                        question_labels = $(this).find('td:nth-child(3) li');
-                        question_labels.each(function(idx) { label_list.push($(this).text()); });
-                        html_contents += `<div class="multilabel">` +
-                        `<div><span class="circle">${question_number}</span><span class="circle">.</span><span class="text">${label_list[0]}</span></div>`;
-                        for (let i=1; i<question_labels.length; i++) {
-                            html_contents += `<div><span class="circle">.</span><span class="circle">.</span><span class="text">${label_list[i]}</span></div>`;
-                        }
+                        html_contents += `<div class="multichoice"><span class="${$(this).attr('class')}">${question_number}</span>`;
+                        for (let i=0; i<question_labels.length; i++) { html_contents += `<span>${question_labels[i]}</span>`; }
                         html_contents += `</div>`;
                     } else {
                         question_labels = parseInt($(this).find('td:nth-child(3)').text().split(": ")[1]);
-                        html_contents += `<div class="verbose"><span>${question_number}</span>`;
+                        html_contents += `<div class="verbose"><span class="${$(this).attr('class')}">${question_number}</span>`;
                         for (let i=0; i<question_labels; i++) { html_contents += `<span>.</span>`; }
                         html_contents += `</div>`;
                     }
                     $('#answers_div').append(html_contents);
-                    // sort_questions();
                 }
             });
             row_number_added = true;
@@ -155,86 +70,20 @@ $(function () {
         });
     });
 
-    $('#headerboxes_form table .form-check-input').change(function() {
-        var $row = $(this).closest('tr');
-        var $input = $row.find('input[type="text"]');
-
-        if ($(this).prop('checked')) {
-            $input.prop('disabled', false);
-        } else {
-            $input.prop('disabled', true);
-        }
-    });
-
-    $("#headerboxes_form").submit(function (e) {
-        e.preventDefault();
-        var data = [];
-
-        $("#headerboxes_form table tbody tr").each(function() {
-            var header_txt = $(this).find('td:first').text();
-            var checkbox_val = $(this).find("input[type='checkbox']").is(':checked');
-            var label_txt = $.trim($(this).find('input[type="text"]').val());
-
-            var row = {
-                'header': header_txt,
-                'enabled': checkbox_val,
-                'label': label_txt
-            }
-            data.push(row);
-        });
-
-        var formdata = new FormData();
-        formdata.append('data', JSON.stringify(data));
-        formdata.append('step', 3);
-        formdata.append('sheet', $('#sheet_input_id').val());
-        
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: formdata,
-            dataType: 'json',
-            contentType: false,
-            processData: false,
-            headers: {
-                'X-CSRFToken': CSRF_TOKEN
-            },
-            beforeSend: function() {
-                $("#back_btn_1").hide();
-                $("#forward_btn_2").html("Saving <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
-            },
-            success: function(response) {
-                if (response.success) {
-                    window.location.href = response.url;
-                } else {
-                    $("#back_btn_1").show();
-                    $("#forward_btn_2").html(`Next <i class="fas fa-long-arrow-right"></i>`).attr('type', 'submit');
-                    var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-                    $("#headerboxes_form .formsms").html(fdback);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log(error);
-            }
-        });
-    });
-
-    $('#multi_labels').on('input', function(){
-        $(this).val($(this).val().toUpperCase());
-    });
-
     $("#multi_choice_form").submit(function (e) {
         e.preventDefault();
 
         var questions = {
-                'qn_type': parseInt($('#multi_type').val()),
-                'qn_labels': $.trim($('#multi_labels').val()),
-            }
+            'qn_type': parseInt($('#multi_type').val()),
+            'qn_labels': $.trim($('#multi_labels').val()),
+        }
 
         var formdata = new FormData();
         formdata.append('questions', JSON.stringify(questions));
         formdata.append('qns_type', $('#qn_type_multichoice').val());
         formdata.append('qn_number', $('#multi_questions').val());
-        formdata.append('step', 4);
+        formdata.append('qn_marks', parseFloat($('#multichoices_marks').val()));
+        formdata.append('step', 3);
         formdata.append('sheet', $('#custom_sheet_id').val());
         
         $.ajax({
@@ -273,83 +122,6 @@ $(function () {
         });
     });
 
-    $("#verbose_label_form").submit(function (e) {
-        e.preventDefault();
-
-        var short_long_labels = [];
-        var short_labels_array = [];
-        $("#verbose_label_form table tbody tr").each(function() {
-            var short_label = $.trim($(this).find('td .l_short').val());
-            var long_label = $.trim($(this).find('td .l_long').val());
-            if ((short_label.length == 1) && (long_label.length > 2)) {
-                short_long_labels.push({'short': short_label.toUpperCase(), 'long': long_label});
-                short_labels_array.push(short_label);
-            }
-        });
-
-        var duplicate_labels = (input_array) => {
-            const duplicates =input_array.filter((item, index) =>input_array.indexOf(item) !== index);
-            return Array.from(new Set(duplicates));
-        }
-
-        if(duplicate_labels(short_labels_array).length == 0) {
-            if (short_long_labels.length > 1) {
-                var formdata = new FormData();
-                formdata.append('questions', JSON.stringify(short_long_labels));
-                formdata.append('qns_type', $('#qn_type_verboselabel').val());
-                formdata.append('qn_number', $('#v_label_num_questions').val());
-                formdata.append('show_labels', $('#v_show_labels').val());
-                formdata.append('step', 4);
-                formdata.append('sheet', $('#custom_sheet_id').val());
-                
-                $.ajax({
-                    type: 'POST',
-                    url: $(this).attr('action'),
-                    data: formdata,
-                    dataType: 'json',
-                    contentType: false,
-                    processData: false,
-                    headers: {
-                        'X-CSRFToken': CSRF_TOKEN
-                    },
-                    beforeSend: function() {
-                        $("#verbose_label_form").html('');
-                        $("#cancel_vlabel_btn").hide();
-                        $("#submit_vlabel_btn").html("Saving <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
-                    },
-                    success: function(response) {
-                        $("#cancel_vlabel_btn").show();
-                        $("#submit_vlabel_btn").html(`Next <i class="fas fa-long-arrow-right"></i>`).attr('type', 'submit');
-    
-                        if (response.success) {
-                            $('#verbose_label_modal').modal('hide');
-                            $("#qns_table").load(location.href + " #qns_table");
-                            $("#verbose_label_form")[0].reset();
-                            $("#verbose_label_form .formsms").html('');
-                            row_number_added = false;
-                            window.location.reload();
-                        } else {
-                            $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
-                            var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-                            $("#verbose_label_form .formsms").html(fdback);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(error);
-                    }
-                });
-            } else {
-                $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
-                var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> Please enter atleast 2 verbose labels. <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-                $("#verbose_label_form .formsms").html(fdback);
-            }
-        } else {
-            $('#verbose_label_form .modal-dialog').animate({ scrollTop: 0 }, 'fast');
-            var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> Short labels should be unique in each field. <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-            $("#verbose_label_form .formsms").html(fdback);
-        }
-    });
-
     $("#verbose_questions_form").submit(function (e) {
         e.preventDefault();
 
@@ -357,7 +129,8 @@ $(function () {
         formdata.append('questions', JSON.stringify({'chars': parseInt($('#verb_num_chars').val())}));
         formdata.append('qns_type', $('#qn_type_verboseqns').val());
         formdata.append('qn_number', $('#verb_num_questions').val());
-        formdata.append('step', 4);
+        formdata.append('qn_marks', $('#verbose_marks').val());
+        formdata.append('step', 3);
         formdata.append('sheet', $('#custom_sheet_id').val());
         
         $.ajax({
@@ -404,7 +177,7 @@ $(function () {
             var current_row_count = 0;
             var row_index_array = [];
             $("#qns_table tbody tr").each(function (index, element) {
-                if((index <= (row_count-2)) && $(this).find('td:nth-child(4) input').is(':checked')) {
+                if((index <= (row_count-2)) && $(this).find('td:nth-child(5) input').is(':checked')) {
                     row_index_array.push(index);
                     var tr_class = $(this).attr('class');
                     if(current_row_id == tr_class) {
@@ -430,7 +203,7 @@ $(function () {
                 
                 var formdata = new FormData();
                 formdata.append('questions', JSON.stringify(questions_to_remove));
-                formdata.append('step', 6);
+                formdata.append('step', 5);
                 
                 $.ajax({
                     type: 'POST',
@@ -475,39 +248,87 @@ $(function () {
 
     $("#publish_confirm_form").submit(function (e) {
         e.preventDefault();
+        var squares_count = 9;
+        var circles_count = 90;
+        var start_count_circles = 0;
+        var start_count_squares = 0;
+        var questions_array = [];
+
+        $("#answers_div .multichoice").each(function (index, element) {
+            start_count_circles = circles_count;
+            var qn_options = "";
+            var qn_number = $(this).find('span:nth-child(1)').text();
+            $(this).find('span').slice(1).each(function() {
+                qn_options += $(this).text();
+                circles_count++;
+            });
+            var qn_indexes = start_count_circles+"-"+(circles_count-1);
+            var span_question = $(this).find('span:nth-child(1)').attr('class');
+            questions_array.push({
+                'qn_number': qn_number,
+                'qn_options': qn_options,
+                'qn_indices': qn_indexes,
+                'qn_question': parseInt(span_question.split('_')[1]),
+                'qn_type': 'circle'
+            });
+        });
+
+        $("#answers_div .verbose").each(function (index, element) {
+            start_count_squares = squares_count;
+            var qn_number = $(this).find('span:nth-child(1)').text();
+            $(this).find('span').slice(1).each(function() { squares_count++; });
+            var qn_boxes_count = $(this).find('span').length-1;
+            var qn_indexes = start_count_squares+"-"+(squares_count-1);
+            var span_question = $(this).find('span:nth-child(1)').attr('class');
+            questions_array.push({
+                'qn_number': qn_number,
+                'qn_options': qn_boxes_count,
+                'qn_indices': qn_indexes,
+                'qn_question': parseInt(span_question.split('_')[1]),
+                'qn_type': 'square'
+            });
+        });
 
         var formdata = new FormData();
-        formdata.append('step', 5);
+        formdata.append('step', 4);
         formdata.append('sheet', $('#custom_sheet_id').val());
+        formdata.append('questions', JSON.stringify(questions_array));
+        formdata.append('circles_count', circles_count);
+        formdata.append('squares_count', squares_count);
         
-        $.ajax({
-            type: 'POST',
-            url: $("#publish_sheet_form").attr('action'),
-            data: formdata,
-            dataType: 'json',
-            contentType: false,
-            processData: false,
-            headers: {
-                'X-CSRFToken': CSRF_TOKEN
-            },
-            beforeSend: function() {
-                $("#publish_cancel_btn").hide();
-                $("#publish_confirm_btn").html("Publishing <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
-            },
-            success: function(response) {
-                if (response.success) {
-                    window.location.href = response.url;
-                } else {
-                    $("#publish_cancel_btn").show();
-                    $("#publish_confirm_btn").html(`Publish <i class="fas fa-check-circle"></i>`).attr('type', 'submit');
-                    var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
-                    $("#publish_confirm_form .formsms").html(fdback);
+        if ((circles_count > 90) || (squares_count > 9)) {
+            $.ajax({
+                type: 'POST',
+                url: $("#publish_sheet_form").attr('action'),
+                data: formdata,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                headers: {
+                    'X-CSRFToken': CSRF_TOKEN
+                },
+                beforeSend: function() {
+                    $("#publish_cancel_btn").hide();
+                    $("#publish_confirm_btn").html("Publishing <i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        window.location.href = response.url;
+                    } else {
+                        $("#publish_cancel_btn").show();
+                        $("#publish_confirm_btn").html(`Publish <i class="fas fa-check-circle"></i>`).attr('type', 'submit');
+                        var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> ${response.sms} <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+                        $("#publish_confirm_form .formsms").html(fdback);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.log(error);
-            }
-        });
+            });
+        } else {
+            var fdback = `<div class="alert alert-danger alert-dismissible fade show px-2 m-0 d-block w-100"><i class='fas fa-exclamation-circle'></i> No questions to publish, add questions. <button type="button" class="btn-close d-inline-block" data-bs-dismiss="alert"></button></div>`;
+            $("#publish_confirm_form .formsms").html(fdback);
+        }
     });
 
     function get_dates(dt) {
@@ -565,9 +386,11 @@ $(function () {
             targets: 5,
             className: 'align-middle text-nowrap text-center',
             createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                var cell_content =`<button type="button" class="btn btn-bblight btn-sm text-white"><i class="fas fa-trash-alt"></i></button>`;
+                var cell_content = `<a href="${rowData.mark_scheme}" title="Marking scheme" class="mark btn btn-success btn-sm me-1"><i class="fas fa-check-circle"></i></a>` +
+                `<a href="${rowData.edit_sheet}" title="Edit answer sheet" class="edit btn btn-bblue btn-sm text-white"><i class="fas fa-edit"></i></a>` + 
+                `<button type="button" title="Delete answer sheet" class="del btn btn-danger btn-sm text-white ms-1"><i class="fas fa-trash-alt"></i></button>`;
                 $(cell).html(cell_content);
-                $(cell).find('button').on('click', function(e) {
+                $(cell).find('button.del').on('click', function(e) {
                     e.preventDefault();
                     $("#confirm_delete_modal strong").text(rowData.names);
                     $("#sheet_del_id").val(rowData.id);
@@ -582,7 +405,7 @@ $(function () {
                 text: "<i class='fas fa-clone'></i>",
                 className: "btn btn-bblight text-white",
                 titleAttr: "Copy",
-                title: "Custom answer sheets - CIVE Grade",
+                title: "Custom answer sheets - UDOM EMS",
                 exportOptions: {
                     columns: [0, 1, 2, 3, 4]
                 }
@@ -592,7 +415,7 @@ $(function () {
                 text: "<i class='fas fa-file-pdf'></i>",
                 className: "btn btn-bblight text-white",
                 titleAttr: "Export to PDF",
-                title: "Custom answer sheets - CIVE Grade",
+                title: "Custom answer sheets - UDOM EMS",
                 filename: 'custom-sheets-civegrade',
                 orientation: 'portrait',
                 pageSize: 'A4',
@@ -634,7 +457,7 @@ $(function () {
                 text: "<i class='fas fa-file-excel'></i>",
                 className: "btn btn-bblight text-white",
                 titleAttr: "Export to Excel",
-                title: "Custom answer sheets - CIVE Grade",
+                title: "Custom answer sheets - UDOM EMS",
                 exportOptions: {
                     columns: [0, 1, 2, 3, 4]
                 }
@@ -643,7 +466,7 @@ $(function () {
                 extend: "print",
                 text: "<i class='fas fa-print'></i>",
                 className: "btn btn-bblight text-white",
-                title: "Custom answer sheets - CIVE Grade",
+                title: "Custom answer sheets - UDOM EMS",
                 orientation: 'portrait',
                 pageSize: 'A4',
                 titleAttr: "Print",

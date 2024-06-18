@@ -1,0 +1,108 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block title %}
+  Marking schemes | UDOM EMS
+{% endblock %}
+{% block styles %}
+  <link href="{% static 'css/answer_sheets/marking_schemes.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contents %}
+  {% if marking_scheme_info %}
+    <div class="d-block w-100 float-start p-2 text-ttxt1">
+      <div class="input-group d-block w-100 float-start my-1 text-start border-bottom border-bblue rounded-start">
+        <a href="{% url 'marking_schemes_list' %}" class="btn btn-bblue text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Back</a>
+        <div class="d-inline-block fs-6 ms-2 py-1">{{ sheet_name }}: marking scheme</div>
+      </div>
+      <form class="d-block float-start my-2 table-responsive" action="{% url 'scheme_details' sheet_id %}" id="save_marking_scheme" autocomplete="off">
+        <div class="formsms w-100 float-start text-start my-1"></div>
+        <table class="table w-100 text-ttxt1 align-middle" id="question_list_table">
+          <thead class="bg-bblight text-white">
+            <tr>
+              <th>Number</th>
+              <th>Options</th>
+              <th>Answer</th>
+              <th>Marks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for quest in questions %}
+              <tr id="tr_{{ quest.id }}">
+                <td>{{ quest.number }}</td>
+                <td class="text-start">{{ quest.options }}</td>
+                <td>
+                  <div class="form-floating d-block">
+                    <input type="text" maxlength="{{ quest.length }}" class="form-control text-ttxt1" id="answer_{{ quest.number }}" value="{{ quest.answer }}" placeholder="p" required />
+                    <label for="answer_{{ quest.number }}">Correct answer</label>
+                  </div>
+                </td>
+                <td>{{ quest.marks }}</td>
+              </tr>
+            {% endfor %}
+            {% if not questions %}
+              <tr>
+                <td colspan="4" class="text-center py-3">No questions on this answer sheet!</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+        {% if questions %}
+          <div class="d-block w-100 float-start p-2 my-3">
+            <a href="{% url 'marking_schemes_list' %}" id="cancel_save_btn" class="btn btn-bblight text-white d-inline-block float-start"><i class="fas fa-long-arrow-left"></i> Cancel</a>
+            <button type="submit" id="save_markscheme_btn" class="btn btn-bblight text-white d-inline-block float-end"><i class="fas fa-save"></i> Save</button>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  {% else %}
+    <div class="searchdiv input-group w-100 float-start">
+      <input type="text" class="form-control text-ttxt fs-6" id="schemes_search" placeholder="Search.." autocomplete="off" />
+      <button type="button" class="btn btn-bblue text-white ms-1" id="schemes_filter_clear" title="Clear filters"><i class="fas fa-refresh"></i></button>
+    </div>
+
+    <div class="d-block w-100 float-start my-2 table-responsive">
+      <table class="table text-ttxt text-center align-middle table-striped" id="markingschemes_table">
+        <thead>
+          <tr class="bg-bblight text-white">
+            <th>S/n</th>
+            <th>Created</th>
+            <th>AnswerSheet</th>
+            <th>Questions</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div class="modal fade" id="date_filter_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-bblight">
+            <h5 class="modal-title text-white">Select range of dates..</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-floating d-block w-100 float-start my-1">
+              <input type="date" class="form-control text-ttxt1" id="min_date" placeholder="d" />
+              <label for="min_date" class="text-ttxt1">Minimum date</label>
+            </div>
+            <div class="form-floating d-block w-100 float-start my-1">
+              <input type="date" class="form-control text-ttxt1" id="max_date" placeholder="d" />
+              <label for="max_date" class="text-ttxt1">Maximum date</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-long-arrow-left"></i></button>
+            <button type="button" class="btn btn-bblight text-white" id="date_clear"><i class="fas fa-refresh"></i></button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="date_filter_btn"><i class="fas fa-check-circle"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" value="{% url 'marking_schemes_list' %}" id="schemes_list_url" />
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+  <script src="{% static 'js/answer_sheets/marking_schemes.js' %}"></script>
+{% endblock %}

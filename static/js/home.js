@@ -1,35 +1,63 @@
 $(function () {
-    var CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    $("#upload_form").submit(function (e) {
-        e.preventDefault();
-
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: new FormData($(this)[0]),
-            dataType: 'json',
-            contentType: false,
-            processData: false,
-            headers: {
-                'X-CSRFToken': CSRF_TOKEN
-            },
-            beforeSend: function() {
-                $("#majibu_button").html("<i class='fas fa-spinner fa-pulse'></i>").attr('type', 'button');
-            },
-            success: function(response) {
-                $("#majibu_button").html("Submit").attr('type', 'submit');
-                if (response.success) {
-                    $("#upload_form")[0].reset();
-                    $("#upload_form").before(`<h1 class="my-5 text-ttxt1 d-block">ImageText: <pre>${response.img_text}</pre></h1>`);
-                } else {
-                    var fdback = `<i class='fas fa-exclamation-circle'></i> ${response.sms}</div>`;
-                    $("#upload_form .formsms").html(fdback).show();
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log(error);
-            }
-        });
-    });
-})
+    //Dashboard clock
+    function timeDisplay() {
+        var d = new Date();
+        var s = d.getSeconds();
+        var m = d.getMinutes();
+        var h = d.getHours();
+        var day = d.getDay();
+        var dt = d.getDate();
+        var month = d.getMonth();
+        var yr = d.getFullYear();
+    
+        switch (day) {
+        case 0: day = 'Sunday';
+        break;
+        case 1: day = 'Monday';
+        break;
+        case 2: day = 'Tueday';
+        break;
+        case 3: day = 'Wednesday';
+        break;
+        case 4: day = 'Thursday';
+        break;
+        case 5: day = 'Friday';
+        break;
+        case 6: day = 'Saturday';
+        break;
+        }
+    
+        switch (month) {
+        case 0: month = 'January';
+        break;
+        case 1: month = 'February';
+        break;
+        case 2: month = 'March';
+        break;
+        case 3: month = 'April';
+        break;
+        case 4: month = 'May';
+        break;
+        case 5: month = 'June';
+        break;
+        case 6: month = 'July';
+        break;
+        case 7: month = 'August';
+        break;
+        case 8: month = 'September';
+        break;
+        case 9: month = 'October';
+        break;
+        case 10: month = 'November';
+        break;
+        case 11: month = 'December';
+        break;
+        }
+    
+        s = (s < 10 ? '0'+s : s);
+        m = (m < 10 ? '0'+m : m);
+        h = (h < 10 ? '0'+h : h);
+        $("#clock").html(day+", "+dt+" "+month+" "+yr+" - "+h+" : "+m+" : "+s);
+    }
+    setInterval(timeDisplay,1000);  
+});

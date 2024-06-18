@@ -6,13 +6,16 @@ from django.contrib.auth import authenticate
 
 User = get_user_model()
 
-# Teacher registration form
+# User registration form
 class CustomUserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-
     class Meta:
         model = get_user_model()
-        fields = ['fullname', 'username', 'phone', 'password']
+        fields = ['fullname', 'username', 'phone', 'comment']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['phone'].required = False
+        self.fields['comment'].required = False
 
     def clean_fullname(self):
         getName = self.cleaned_data['fullname'].strip()
@@ -21,35 +24,39 @@ class CustomUserForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data['username'].strip().capitalize()
-        if len(username) < 3:
-            raise forms.ValidationError("Username is too short.")
+        if len(username) < 5:
+            raise forms.ValidationError("Username should be atleast 5 alphabets long.")
         if not username.isalpha():
             raise forms.ValidationError("Username should contain only alphabets A-Z.")
         if self.instance and self.instance.pk:
             if User.objects.filter(username=username, deleted=False).exclude(pk=self.instance.pk).exists():
-                raise forms.ValidationError("This username is already used by another teacher.")
+                raise forms.ValidationError("This username is already used by another user.")
         else:
             if User.objects.filter(username=username, deleted=False).exists():
-                raise forms.ValidationError("This username is already used by another teacher.")
+                raise forms.ValidationError("This username is already used by another user.")
         return username
     
     def clean_phone(self):
-        phone = self.cleaned_data.get('phone')
+        phone = self.cleaned_data.get('phone').strip()
         if phone and not phone.isdigit():
             raise forms.ValidationError("Please use a 10-digit phone number.")
         if phone and len(phone) != 10:
             raise forms.ValidationError("Please use a 10-digit phone number.")
-        if self.instance and self.instance.pk:
+        if phone and self.instance and self.instance.pk:
             if User.objects.filter(phone=phone, deleted=False).exclude(pk=self.instance.pk).exists():
-                raise forms.ValidationError("This phone is already used by another teacher.")
+                raise forms.ValidationError("This phone is already used by another user.")
         else:
-            if User.objects.filter(phone=phone, deleted=False).exists():
-                raise forms.ValidationError("This phone is already used by another teacher.")
+            if phone and User.objects.filter(phone=phone, deleted=False).exists():
+                raise forms.ValidationError("This phone is already used by another user.")
         return phone
+    
+    def clean_comment(self):
+        comment = self.cleaned_data.get('comment', '').strip()
+        return None if comment in ("", "-") else comment
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        password = self.cleaned_data['password']
+        password = self.cleaned_data['username'].strip().upper()
         user.set_password(password)
         if commit:
             user.save()
@@ -58,7 +65,7 @@ class CustomUserForm(forms.ModelForm):
     
 
 
-# Teacher login form
+# User login form
 class CustomAuthenticationForm(AuthenticationForm):
     def clean(self):
         username = self.cleaned_data.get('username')
@@ -72,5 +79,4 @@ class CustomAuthenticationForm(AuthenticationForm):
                 raise forms.ValidationError("Account blocked, contact your admin.")
             if user.deleted:
                 raise forms.ValidationError("Invalid account, contact your admin.")
-
         return self.cleaned_data

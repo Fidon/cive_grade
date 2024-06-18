@@ -1,0 +1,188 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block title %}
+  Classes | UDOM EMS
+{% endblock %}
+{% block styles %}
+  <link href="{% static 'css/st_classes/classes.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contents %}
+  {% if class_info %}
+    <div class="class_info">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#class_info_div">Information</a>
+        </li>
+      </ul>
+      <div class="tab_container">
+        <div id="class_info_div" class="tab_div">
+          <h5>Class/Program information..</h5><hr class="my-1" />
+          <div class="info">
+            <div>
+              <b>Created on:</b> &nbsp; {{ class.regdate }}
+            </div>
+            <div>
+              <b>Last edited on:</b> &nbsp; {{ class.lastEdit }}
+            </div>
+            <div>
+              <b>Class name:</b> &nbsp; {{ class.names }}
+            </div>
+            <div>
+              <b>Class abbrev:</b> &nbsp; {{ class.abbrev }}
+            </div>
+            <div>
+              <b>Duration:</b> &nbsp; {{ class.duration }} Years
+            </div>
+            <div>
+              <b>Students:</b> &nbsp; {{ class.students }}
+            </div>
+            <div class="d-block w-100">
+              <b>Class description:</b> &nbsp; {{ class.describe|linebreaks }}
+            </div>
+            <div class="d-block w-100 py-3">
+              <button type="button" class="btn btn-bblue text-white d-inline-block m-2" data-bs-toggle="offcanvas" data-bs-target="#update_classes_canvas">Update</button>
+              <button type="button" class="btn btn-danger d-inline-block m-2" data-bs-toggle="modal" data-bs-target="#confirm_delete_modal">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="offcanvas offcanvas-start" id="update_classes_canvas">
+      <div class="offcanvas-header bg-bblue">
+        <h6 class="offcanvas-title text-white">Update class/program info..</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body bg-llight">
+        <form class="d-block w-100 float-start" id="new_class_form" action="{% url 'class_actions' %}" autocomplete="off">
+          <div class="formsms w-100 float-start my-1 text-start"></div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt fs-6" id="class_names" name="names" placeholder="p" value="{{ class.names }}" required />
+            <label for="class_names" class="text-ttxt fs-6">Class/program name</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt fs-6" id="class_abbrev" name="abbrev" placeholder="p" value="{{ class.abbrev }}" required />
+            <label for="class_abbrev" class="text-ttxt fs-6">Abbrev name e.g CNISE</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="number" min="1" max="5" class="form-control text-ttxt fs-6" id="class_duration" name="duration" placeholder="p" value="{{ class.duration }}" required />
+            <label for="class_duration" class="text-ttxt fs-6">Program duration (years)</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <textarea class="form-control text-ttxt fs-6" id="class_describe" placeholder="d" style="min-height:150px;" name="description">{{ class.info }}</textarea>
+            <label for="class_describe" class="text-ttxt fs-6">Class description/comment (if any)</label>
+          </div>
+          <input type="hidden" value="{{ class.id }}" name="edit_class" id="get_class_id" />
+          <div class="form-floating d-block w-100 float-start my-3 text-end">
+            <button type="button" class="btn btn-danger d-inline-block me-2" id="class_cancel_btn" data-bs-dismiss="offcanvas">Cancel</button>
+            <button type="submit" class="btn btn-success d-inline-block" id="class_submit_btn">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" id="confirm_delete_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-bblue">
+            <h6 class="modal-title text-white">Delete class..</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="formsms d-block float-start w-100 text-start"></div>
+            <div class="form-floating d-block w-100 float-start text-ttxt fs-6 py-3 my-1">Are you sure you want to delete this class..?</div>
+            <input type="hidden" value="{{ class.id }}" name="delete_class" id="get_classination_id" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="cancel_delete_btn"><i class="fas fa-times-circle"></i> No</button>
+            <button type="button" class="btn btn-danger" id="confirm_delete_btn"><i class="fas fa-check-circle"></i> Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="searchdiv input-group w-100 float-start">
+      <input type="text" class="form-control text-ttxt fs-6" id="classes_search" placeholder="Search.." autocomplete="off" />
+      <button type="button" class="btn btn-bblue text-white ms-1" id="classes_filter_clear" title="Clear filters"><i class="fas fa-refresh"></i></button>
+      <button type="button" class="btn btn-success ms-1" id="add_new_class" title="Add new class" data-bs-toggle="offcanvas" data-bs-target="#new_class_canvas"><i class="fas fa-plus-circle"></i></button>
+    </div>
+
+    <div class="d-block w-100 float-start my-2 table-responsive">
+      <table class="table text-ttxt text-center align-middle table-striped" id="classes_list_table">
+        <thead>
+          <tr class="bg-bblight text-white">
+            <th>S/n</th>
+            <th>Created</th>
+            <th>ProgramName</th>
+            <th>Abbrev</th>
+            <th>Students</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div class="modal fade" id="date_filter_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-bblight">
+            <h5 class="modal-title text-white">Select range of dates..</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-floating d-block w-100 float-start my-1">
+              <input type="date" class="form-control text-ttxt1" id="min_date" placeholder="d" />
+              <label for="min_date" class="text-ttxt1">Minimum date</label>
+            </div>
+            <div class="form-floating d-block w-100 float-start my-1">
+              <input type="date" class="form-control text-ttxt1" id="max_date" placeholder="d" />
+              <label for="max_date" class="text-ttxt1">Maximum date</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-long-arrow-left"></i></button>
+            <button type="button" class="btn btn-bblight text-white" id="date_clear"><i class="fas fa-refresh"></i></button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="date_filter_btn"><i class="fas fa-check-circle"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" value="{% url 'classes_list' %}" id="classes_list_url" />
+
+    <div class="offcanvas offcanvas-start" id="new_class_canvas">
+      <div class="offcanvas-header bg-bblue">
+        <h6 class="offcanvas-title text-white">Create new class..</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body bg-llight">
+        <form class="d-block w-100 float-start" id="new_class_form" action="{% url 'class_actions' %}" autocomplete="off">
+          <div class="formsms w-100 float-start my-1 text-start"></div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt fs-6" id="class_names" name="names" placeholder="p" required />
+            <label for="class_names" class="text-ttxt fs-6">Class/program name</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="text" class="form-control text-ttxt fs-6" id="class_abbrev" name="abbrev" placeholder="p" required />
+            <label for="class_abbrev" class="text-ttxt fs-6">Abbrev name e.g CNISE</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <input type="number" min="1" max="5" class="form-control text-ttxt fs-6" id="class_duration" name="duration" placeholder="p" required />
+            <label for="class_duration" class="text-ttxt fs-6">Program duration (years)</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-1">
+            <textarea class="form-control text-ttxt fs-6" id="class_describe" placeholder="d" style="min-height:150px;" name="description"></textarea>
+            <label for="class_describe" class="text-ttxt fs-6">Class description/comment (if any)</label>
+          </div>
+          <div class="form-floating d-block w-100 float-start my-3 text-end">
+            <button type="button" class="btn btn-danger d-inline-block me-2" id="class_cancel_btn" data-bs-dismiss="offcanvas">Cancel</button>
+            <button type="submit" class="btn btn-success d-inline-block" id="class_submit_btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+  <script src="{% static 'js/st_classes/classes.js' %}"></script>
+{% endblock %}

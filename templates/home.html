@@ -7,31 +7,11 @@
   <link href="{% static 'css/home.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block contents %}
-  <table class="table w-50 table-bordered table-striped m-3">
-    {% for row in tabledata %}
-      <tr>
-        <td>{{ row.row_idx }}</td>
-        {% for cell in row.row_data %}
-          {% if cell == None %}
-            <td></td>
-          {% else %}
-            <td>{{ cell }}</td>
-          {% endif %}
-        {% endfor %}
-      </tr>
-    {% endfor %}
-  </table>
-  <form id="upload_formm" action="{% url 'upload_majibu' %}" enctype="multipart/form-data" method="post" autocomplete="off" class="d-none w-50 p-5">
-    {% csrf_token %}
-    <div class="formsms text-start mb-1"></div>
-    <div class="form-floating mt-2">
-      <input type="file" class="form-control" id="file_img" name="majibu" required />
-      <label for="file_img" class="form-label text-ttxt1">Add image</label>
-    </div>
-    <div class="form-floating mt-3">
-      <button type="submit" id="majibu_button" class="btn btn-lg btn-bblue text-white d-inline-block float-end">Submit</button>
-    </div>
-  </form>
+  <div class="imgbox w-100">
+    <img src="{% static 'imgs/udom_logo.png' %}" alt="udom logo" />
+  </div>
+  <div class="welcome w-100 text-start text-ttxt1">Welcome back, {{ request.user.fullname }}</div>
+  <div class="watch w-100 text-start text-ttxt1" id="clock"></div>
 {% endblock %}
 {% block scripts %}
   <script src="{% static 'js/home.js' %}"></script>

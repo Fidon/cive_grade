@@ -3,3 +3,32 @@
     background-color: #FEECEB;
     color: #2D2D2D;
 }
+
+#contents .imgbox img {
+    display: inline-block;
+    width: 220px;
+    margin: 15px 0;
+}
+#contents .welcome {
+    padding: 0 20px;
+    font-size: 23px;
+    margin-top: 20px;
+}
+#contents .watch {
+    padding: 0 20px;
+    font-size: 17px;
+    margin-top: 5px;
+}
+
+@media (max-width: 569px) {
+    #contents .imgbox img {
+        width: 190px;
+    }
+    #contents .welcome {
+        padding: 0 5px;
+        font-size: 20px;
+    }
+    #contents .watch {
+        padding: 0 5px;
+    }
+}

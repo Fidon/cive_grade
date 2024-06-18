@@ -89,7 +89,7 @@
 
 
 #contents form {
-    width: 600px;
+    width: 590px;
 }
 #contents form.form_step2 input[type='checkbox'] {
     width: 35px;
@@ -113,13 +113,13 @@
 
 /* answer sheet customization */
 #contents div.answer_sheet {
-    width: 650px;
+    width: 800px;
     float: right;
-    height: 1032px;
+    height: 1130px;
     border: 1px solid rgba(45, 45, 45, .2);
-    padding: 10px;
+    padding: 5px;
     margin-top: 70px;
-    margin-right: 100px;
+    margin-right: 10px;
     text-align: left;
     overflow: hidden;
 }
@@ -128,38 +128,58 @@
 #sheet_view .sheeet_head {
     display: flex;
     width: 100%;
-    margin-bottom: 5px;
     float: left;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #696969;
 }
-
-#sheet_view .sheeet_head .title {
-    width: 82px;
-    font-size: 15px;
-    color: #696969;
+#sheet_view .sheeet_head .heading,
+#sheet_view .sheeet_head .regnumber {
+    display: inline-block;
+    width: 50%;
+    position: relative;
     text-align: center;
-    margin-top: 5px;
 }
-
-#sheet_view .sheeet_head .id_boxes,
-#sheet_view .sheeet_head .box {
-    flex: 1;
-    display: flex;
+#sheet_view .sheeet_head .heading span {
+    font-weight: bold;
+    width: 100%;
+    color: #2D2D2D;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
-
-#sheet_view .sheeet_head .id_boxes span {
+#sheet_view .sheeet_head .regnumber div {
+    display: block;
+    width: 100%;
+    float: left;
+    font-size: 0;
+}
+#sheet_view .sheeet_head .regnumber div span {
+    display: inline-block;
+    font-size: 15px;
+    /* width: 30px;
+    height: 30px; */
+    width: 25px;
+    height: 25px;
+    margin: 3px;
+    border: 1px solid #696969;
+    color: rgba(105, 105, 105, .7);
+    text-align: center;
+    line-height: 23px;
+    border-radius: 50%;
+}
+#sheet_view .sheeet_head .regnumber div:first-child span {
+    border-radius: 0;
     width: 30px;
     height: 30px;
-    border: 1px solid #2D2D2D;
+    line-height: 28px;
+    margin: 3px 0;
+    margin-top: 0;
     border-left: none;
 }
-
-#sheet_view .sheeet_head .id_boxes span:first-child {
-    border-left: 1px solid #2D2D2D;
-}
-
-#sheet_view .sheeet_head .box {
-    height: 30px;
-    border: 1px solid #2D2D2D;
+#sheet_view .sheeet_head .regnumber div:first-child span:first-child {
+    border-left: 1px solid #696969;
 }
 
 
@@ -186,7 +206,7 @@
     height: 25px;
     margin: 3px;
     border: 1px solid #696969;
-    color: #696969;
+    color: rgba(105, 105, 105, .7);
     text-align: center;
     line-height: 23px;
     border-radius: 50%;
@@ -194,6 +214,7 @@
 #answers_div .multichoice span:first-child {
     border: none;
     margin: 3px 0;
+    color: #2D2D2D;
 }
 #answers_div .verbose span {
     display: inline-block;
@@ -207,9 +228,58 @@
     line-height: 28px;
 }
 #answers_div .verbose span:first-child {
-    color: #696969;
+    color: #2D2D2D;
     border: none;
 }
 #answers_div .verbose span:nth-child(2) {
     border-left: 1px solid #2D2D2D;
+}
+
+
+@media only screen and (max-width: 1090px) {
+    #contents form.form_step4 {
+        width: 100%;
+        display: block;
+        float: left;
+        padding: 0;
+        margin: 0;
+    }
+    #contents div.answer_sheet {
+        display: block;
+        width: 100%;
+        float: left;
+        height: 1130px;
+        margin-top: 0;
+        margin-right: 0;
+        margin-left: 0;
+        margin-bottom: 0;
+    }
+}
+@media only screen and (max-width: 660px) {
+    #sheet_view .sheeet_head {
+        display: block;
+    }
+    #sheet_view .sheeet_head .heading,
+    #sheet_view .sheeet_head .regnumber {
+        display: block;
+        width: 100%;
+        float: left;
+        margin: 5px 0;
+    }
+    #sheet_view .sheeet_head .heading {
+        border-bottom: 1px solid #696969;
+    }
+    #sheet_view .sheeet_head .heading span {
+        display: block;
+        width: 100%;
+        position: static;
+        top: 0;
+        left: 0;
+        transform: none;
+    }
+}
+@media only screen and (max-width: 600px) {
+    #contents form {
+        width: 100%;
+    }
 }

@@ -42,8 +42,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique = True, max_length = 150)
     fullname = models.CharField(max_length=255)
     phone = models.CharField(max_length=32, null=True, default=None)
+    dept = models.IntegerField(default=2)
     last_login = models.DateTimeField(null = True, default=None)
     blocked = models.BooleanField(default = False)
+    comment = models.TextField(null=True, default=None)
     is_admin = models.BooleanField(default = False)
     deleted = models.BooleanField(default = False)
     groups = models.ManyToManyField(Group, blank = True, related_name = 'custom_users')
@@ -52,7 +54,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
     
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['fullname', 'phone']
+    REQUIRED_FIELDS = ['fullname']
     
     def __str__(self):
         return str(self.fullname)
